@@ -40,3 +40,7 @@
 .marginTop {
   margin-top: 1%;
 }
+
+.navPrincipal {
+  background-image: linear-gradient(to left, #883b2b, #d3b86b, #e6c05f);
+}
