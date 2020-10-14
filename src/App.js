@@ -1,7 +1,5 @@
 import React from 'react';
 import './App.css';
-import 'jquery';
-import 'bootswatch/dist/litera/bootstrap.min.css';
 
 function App() {
   return (
