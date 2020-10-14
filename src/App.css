@@ -44,3 +44,7 @@
 .navPrincipal {
   background-image: linear-gradient(to left, #883b2b, #d3b86b, #e6c05f);
 }
+
+.rowMargin {
+  margin-top: 2%;
+}
