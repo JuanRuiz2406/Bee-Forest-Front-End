@@ -7,7 +7,8 @@ import {
 } from "react-router-dom";
 
 import productList from './components/product/product-list'
-
+import Login from './components/Login';
+import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
 
 function App() {
