@@ -1,0 +1,22 @@
+*{
+  text-align: center;
+}
+
+#logo{
+  width: 15%;
+  margin-top: 2%;
+}
+
+#form{
+  padding-top: 150px;
+  float: center;
+  width: 47%;
+}
+
+.login{
+  padding: 2% 6%;
+  margin: 0% 35%;
+  border-radius: 1%;
+  border-color: 2px solid #E6A500;
+  background-color: white;
+}

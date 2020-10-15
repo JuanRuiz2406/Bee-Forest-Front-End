@@ -6,6 +6,7 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import Login from './components/Login';
 import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
 
@@ -15,7 +16,7 @@ function App() {
       <div className="container">
         <Switch>
           <Route path="/login">
-            Login
+            <Login/>
           </Route>
           <Route path="/" exact>
             <Navbar/>
