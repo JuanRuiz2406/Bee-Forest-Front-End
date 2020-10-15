@@ -3,12 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import RowTickets from './components/RowTicket';
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
-    <RowTickets/>
   </React.StrictMode>,
   document.getElementById('root')
 );
