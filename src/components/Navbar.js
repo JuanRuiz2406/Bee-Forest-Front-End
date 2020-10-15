@@ -1,6 +1,10 @@
 import React from 'react';
 import '../App.css';
 
+import {
+  Link
+} from "react-router-dom";
+
 class Navbar extends React.Component{
     render(){
         return(
@@ -11,7 +15,7 @@ class Navbar extends React.Component{
             <div className="container">
               
               <nav className="navbar navbar-expand-lg navbar-light bg-light navPrincipal rounded-lg">
-                  <a className="navbar-brand font-weight-bold" href="!#">Bee-Forest</a>
+                  <Link to="/home/pedidos" className="navbar-brand font-weight-bold" type="button">Bee-Forest</Link>
                   <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation" _msthidden="A" _msthiddenattr="1375998" _mstaria-label="320099">
                     <span className="navbar-toggler-icon"></span>
                   </button>
@@ -21,33 +25,31 @@ class Navbar extends React.Component{
                       <li className="nav-item dropdown">
                           <a className="nav-link dropdown-toggle font-weight-bold" data-toggle="dropdown" href="!#" role="button" aria-haspopup="true" aria-expanded="false">Productos</a>
                           <div className="dropdown-menu" _mstvisible="0">
-                            <a className="dropdown-item" href="!#" _msthash="812344" _msttexthash="93353" _mstvisible="1">Productos</a>
-                            <a className="dropdown-item" href="!#" _msthash="812851" _msttexthash="180622" _mstvisible="1">Tipos de Producto</a>
-                            <a className="dropdown-item" href="!#" _msthash="813358" _msttexthash="230152" _mstvisible="1">Materiales</a>
-                            <a className="dropdown-item" href="!#" _msthash="813358" _msttexthash="230152" _mstvisible="1">Proveedores</a>
+                            <Link to="/home/productos" className="dropdown-item">Productos</Link>
+                            <Link to="/home/tipo-de-productos" className="dropdown-item">Tipos de Producto</Link>
+                            <Link to="/home/materiales" className="dropdown-item">Materiales</Link>
+                            <Link to="/home/proveedores" className="dropdown-item">Proveedores</Link>
                           </div>
                         </li>
                         <li className="nav-item dropdown">
                           <a className="nav-link dropdown-toggle font-weight-bold" data-toggle="dropdown" href="!#" role="button" aria-haspopup="true" aria-expanded="false">Personas</a>
                           <div className="dropdown-menu" _mstvisible="0">
-                            <a className="dropdown-item" href="!#" _msthash="812344" _msttexthash="93353" _mstvisible="1">Clientes</a>
-                            <a className="dropdown-item" href="!#" _msthash="812851" _msttexthash="180622" _mstvisible="1">Colaboradores</a>
+                            <Link to="/home/clientes" className="dropdown-item">Clientes</Link>
+                            <Link to="/home/colaboradores" className="dropdown-item">Colaboradores</Link>
                           </div>
                         </li>
                         <li className="nav-item dropdown">
                           <a className="nav-link dropdown-toggle font-weight-bold" data-toggle="dropdown" href="!#" role="button" aria-haspopup="true" aria-expanded="false">Pedidos</a>
                           <div className="dropdown-menu" _mstvisible="0">
-                            <a className="dropdown-item" href="!#" _msthash="812344" _msttexthash="93353" _mstvisible="1">Pedidos</a>
-                            <a className="dropdown-item" href="!#" _msthash="812851" _msttexthash="180622" _mstvisible="1">Devoluciones</a>
-                            <a className="dropdown-item" href="!#" _msthash="813358" _msttexthash="230152" _mstvisible="1">Tipos de Envio</a>
+                            <Link to="/home/pedidos" className="dropdown-item">Pedidos</Link>
+                            <Link to="/home/devoluciones" className="dropdown-item">Devoluciones</Link>
+                            <Link to="/home/tipos-de-envio" className="dropdown-item">Tipos de Envio</Link>
                           </div>
                         </li>
                         </ul>
                       </div>
                 </nav>
-
             </div>
-
             </div>
         );
     }

@@ -4,6 +4,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Link,
 } from "react-router-dom";
 
 import productList from './components/product/product-list'
@@ -19,15 +20,16 @@ function App() {
           <Route path="/login">
             <Login/>
           </Route>
-          <Route path="/" exact>
+          <Route path="/home">
             <Navbar/>
-            <RowTickets/>
+            <Route path="/home/pedidos" component={RowTickets}/>
+            <Route path="/home/productos" component={productList}/>
           </Route>
           <Route path="/algo">
-            Algo
+            <Link to="/home/productos" className="btn btn-primary">Hola</Link>
           </Route>
 
-          <Route exact path="/productos" component={productList}/>
+         
         </Switch>
       </div>
     </Router>
