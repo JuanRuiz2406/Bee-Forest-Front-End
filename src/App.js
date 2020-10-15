@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import productList from './components/product/product-list'
+import providerList from './components/provider/provider-list'
 import Login from './components/Login';
 import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
@@ -24,6 +25,7 @@ function App() {
             <Navbar/>
             <Route path="/home/pedidos" component={RowTickets}/>
             <Route path="/home/productos" component={productList}/>
+            <Route path="/home/proveedores" component={providerList}/>
           </Route>
           <Route path="/algo">
             <Link to="/home/productos" className="btn btn-primary">Hola</Link>
