@@ -1,14 +1,21 @@
 import React, { Component } from "react";
 import Swal from "sweetalert2";
-import { getProducts } from "../../services/productService";
+import { getProducts, storeProducts } from "../../services/productService";
 import { getCategory } from "../../services/categoryService";
 
 export default class productList extends Component {
     
     constructor(props) {
         super(props);
+
         this.onChangeCategoryName = this.onChangeCategoryName.bind(this);
         this.getCategoryName = this.getCategoryName.bind(this);
+        this.onChangeName = this.onChangeName.bind(this);
+        this.onChangePrice = this.onChangePrice.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
+
 
         this.state = {
         products: null,
@@ -20,6 +27,7 @@ export default class productList extends Component {
             name: "",
             price: "",
             description: "",
+            image:"No Image"
           },
           message: ""
         };
@@ -28,7 +36,7 @@ export default class productList extends Component {
     componentDidMount() {
         this.getProducts();
     }
-
+    
      onChangeCategoryName(e) {
 
         const categoryName = e.target.value;
@@ -41,6 +49,38 @@ export default class productList extends Component {
             }));
 
     }
+
+    onChangeDescription(e) {
+       
+        this.setState(prevState => ({
+            currentProduct: {
+            ...prevState.currentProduct,
+            description: e.description
+          }
+        }));
+     }
+
+    onChangeName(e) {
+        
+        this.setState(prevState => ({
+            currentProduct: {
+            ...prevState.currentProduct,
+            name: e.name
+          }
+        }));
+     }
+
+     onChangePrice(e) {
+        
+        this.setState(prevState => ({
+            currentProduct: {
+            ...prevState.currentProduct,
+            price: e.price
+          }
+        }));
+     }
+
+    
 
     async getCategoryName(e) {
        
@@ -64,21 +104,46 @@ export default class productList extends Component {
      
     }
 
-  async getProducts() {
+    async getProducts() {
 
-    if (!this.state.products) {
-        this.setState({ isLoading: true });
+        if (!this.state.products) {
+            this.setState({ isLoading: true });
 
-            const resp = await getProducts("product");
-
-            if (resp.status === "success") {
+                const resp = await getProducts("product");
                 console.log(resp);
-                this.setState({ products: resp.data, isLoading: false });
-            } else {
-                Swal.fire("Error", resp.message, "error");
-            }
+                if (resp.status === "success") {
+                    console.log(resp);
+                    this.setState({ products: resp.data, isLoading: false });
+                } else {
+                    Swal.fire("Error", resp.message, "error");
+                }
+        }
     }
-  }
+
+     refreshPage() {
+        window.location.reload();
+      }
+    async create() {
+
+        const resp = await storeProducts("product", this.state.currentProduct);
+
+        if (resp.status === "success") {
+            console.log(resp);
+            this.refreshPage();
+            
+        } else {
+            Swal.fire("Error", resp.message, "error");
+        }
+
+    }
+    update(e) {
+        // update entity - PUT
+        e.preventDefault();
+    }
+    delete(e) {
+        // delete entity - DELETE
+        e.preventDefault();
+    }
 
   render() {
     const { currentProduct } = this.state;
@@ -131,6 +196,11 @@ export default class productList extends Component {
                           type="text"
                           className="form-control"
                           id="nombre"
+
+                          value={currentProduct.name}
+
+                          onChange={(e) => this.onChangeName({ name: e.target.value })}
+
                         ></input>
                       </div>
 
@@ -141,16 +211,24 @@ export default class productList extends Component {
                           type="number"
                           className="form-control"
                           id="precio"
+                          
+                          value={currentProduct.price}
+                          onChange={(e) => this.onChangePrice({ price: e.target.value })}
+
                         ></input>
                       </div>
 
                       <div className="form-group">
-                        <label htmlFor="cantidad">Cantidad</label>
+                        <label htmlFor="description">Descripcion</label>
                         <input
-                          name="cantidad"
-                          type="number"
+                          name="description"
+                          type="text"
                           className="form-control"
-                          id="cantidad"
+                          id="description"
+                          
+                          value={currentProduct.description}
+                          onChange={(e) => this.onChangeDescription({ description: e.target.value })}
+
                         ></input>
                       </div>
 
@@ -189,6 +267,7 @@ export default class productList extends Component {
                       className="btn btn-primary"
                       value="Agregar"
                       data-dismiss="modal"
+                      onClick={this.create}
                     ></input>
                   </div>
                 </div>
