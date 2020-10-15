@@ -11,7 +11,6 @@ import productList from './components/product/product-list'
 import providerList from './components/provider/provider-list'
 import materialList from './components/material/material-list'
 import clientList from './components/client/client-list'
-import collaboratorList from './components/collaborator/collaborator-list'
 import Login from './components/Login';
 import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
@@ -31,7 +30,6 @@ function App() {
             <Route path="/home/proveedores" component={providerList}/>
             <Route path="/home/materiales" component={materialList}/>
             <Route path="/home/clientes" component={clientList}/>
-            <Route path="/home/colaboradores" component={collaboratorList}/>
           </Route>
           <Route path="/algo">
             <Link to="/home/productos" className="btn btn-primary">Hola</Link>
