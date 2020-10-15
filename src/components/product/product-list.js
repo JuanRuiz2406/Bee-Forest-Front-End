@@ -1,33 +1,56 @@
 import React, { Component } from "react";
 import Swal from "sweetalert2";
 import { getProducts } from "../../services/productService";
+import { getCategory } from "../../services/categoryService";
 
 export default class productList extends Component {
-  constructor(props) {
-    super(props);
+    
+    constructor(props) {
+        super(props);
+        this.onChangeCategory = this.onChangeCategory.bind(this);
 
-    this.state = {
-      products: null,
-      isLoading: null,
-    };
-  }
+        this.state = {
+        products: null,
+        isLoading: null,
 
-  componentDidMount() {
-    this.getProducts();
-  }
+        currentCategory: {
+            id: null,
+            name: "",
+            description: "",
+          },
+          message: ""
+        };
+    }
+
+    componentDidMount() {
+        this.getProducts();
+    }
+
+
+    onChangeCategory(e) {
+        const name = e.target.value;
+        
+        this.setState(prevState => ({
+            currentCategory: {
+            ...prevState.currentCategory,
+            name: name
+          }
+        }));
+      }
 
   async getProducts() {
+
     if (!this.state.products) {
-      this.setState({ isLoading: true });
+        this.setState({ isLoading: true });
 
-      const resp = await getProducts("product");
+            const resp = await getProducts("product");
 
-      if (resp.status === "success") {
-        console.log(resp);
-        this.setState({ products: resp.data, isLoading: false });
-      } else {
-        Swal.fire("Error", resp.message, "error");
-      }
+            if (resp.status === "success") {
+                console.log(resp);
+                this.setState({ products: resp.data, isLoading: false });
+            } else {
+                Swal.fire("Error", resp.message, "error");
+            }
     }
   }
 
