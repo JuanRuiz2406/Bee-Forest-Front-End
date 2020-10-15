@@ -13,10 +13,10 @@ function App() {
     <Router>
       <div className="container">
         <Switch>
-          <Route path="/" exact>
+          <Route path="/login">
             Login
           </Route>
-          <Route path="/home">
+          <Route path="/" exact>
             <div className="container">
             <header className="container marginTop">
               <h1 className="text-center">Bee-Forest</h1>
