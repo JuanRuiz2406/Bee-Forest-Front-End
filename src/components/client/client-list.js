@@ -1,30 +1,30 @@
 import React, { Component } from "react";
 import Swal from "sweetalert2";
-import { getProviders } from "../../services/providerService";
+import { getClients } from "../../services/clientService";
 
-export default class providerList extends Component {
+export default class clientList extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      providers: null,
+      clients: null,
       isLoading: null,
     };
   }
 
   componentDidMount() {
-    this.getProviders();
+    this.getClients();
   }
 
-  async getProviders() {
-    if (!this.state.providers) {
+  async getClients() {
+    if (!this.state.clients) {
       this.setState({ isLoading: true });
 
-      const resp = await getProviders("provider");
+      const resp = await getClients("client");
 
       if (resp.status === "success") {
         console.log(resp);
-        this.setState({ providers: resp.data, isLoading: false });
+        this.setState({ clients: resp.data, isLoading: false });
       } else {
         Swal.fire("Error", resp.message, "error");
       }
@@ -34,11 +34,11 @@ export default class providerList extends Component {
   render() {
     return (
       <div>
-        {this.state.isLoading && <span>Cargando proveedores</span>}
+        {this.state.isLoading && <span>Cargando clientes</span>}
 
-        {this.state.providers && (
+        {this.state.clients && (
           <div>
-            <h3 class="text-center">Proveedores</h3>
+            <h3 class="text-center">Clientes</h3>
 
             <button
               type="button"
@@ -62,7 +62,7 @@ export default class providerList extends Component {
                 <div class="modal-content">
                   <div class="modal-header">
                     <h6 class="modal-title" id="exampleModalScrollableTitle">
-                      Agregar Proveedor
+                      Agregar Cliente
                     </h6>
                     <button
                       type="button"
@@ -75,6 +75,17 @@ export default class providerList extends Component {
                   </div>
                   <div class="modal-body">
                     <form>
+                      
+                      <div class="form-group">
+                        <label for="cedula">Cédula</label>
+                        <input
+                          name="cedula"
+                          type="number"
+                          class="form-control"
+                          id="cedula"
+                        ></input>
+                      </div>
+
                       <div class="form-group">
                         <label for="nombre">Nombre</label>
                         <input
@@ -102,16 +113,6 @@ export default class providerList extends Component {
                           type="number"
                           class="form-control"
                           id="telefono"
-                        ></input>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="direction">Dirección</label>
-                        <input
-                          name="direction"
-                          type="text"
-                          class="form-control"
-                          id="direction"
                         ></input>
                       </div>
 
@@ -147,7 +148,7 @@ export default class providerList extends Component {
                 <div class="modal-content">
                   <div class="modal-header">
                     <h6 class="modal-title" id="exampleModalScrollableTitle">
-                      Editar Producto
+                      Editar Cliente
                     </h6>
                     <button
                       type="button"
@@ -161,6 +162,16 @@ export default class providerList extends Component {
                   <div class="modal-body">
                     <form>
                       
+                    <div class="form-group">
+                        <label for="cedula">Cédula</label>
+                        <input
+                          name="cedula"
+                          type="number"
+                          class="form-control"
+                          id="cedula"
+                        ></input>
+                      </div>
+
                       <div class="form-group">
                         <label for="nombre">Nombre</label>
                         <input
@@ -188,16 +199,6 @@ export default class providerList extends Component {
                           type="number"
                           class="form-control"
                           id="telefono"
-                        ></input>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="direccion">Dirección</label>
-                        <input
-                          name="direccion"
-                          type="text"
-                          class="form-control"
-                          id="direccion"
                         ></input>
                       </div>
 
@@ -242,10 +243,10 @@ export default class providerList extends Component {
               <table id="tabla" class="table table-hover">
                 <thead>
                   <tr>
+                    <th scope="col">Cédula</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Apellido</th>
                     <th scope="col">Teléfono</th>
-                    <th scope="col">Dirección</th>
                     <th scope="col">Correo Electrónico</th>
 
 
@@ -254,13 +255,13 @@ export default class providerList extends Component {
                   </tr>
                 </thead>
                 <tbody id="datosT">
-                  {this.state.providers.map((provider) => (
-                    <tr id={provider.id} key={provider.id}>
-                      <td>{provider.name}</td>
-                      <td>{provider.surname}</td>
-                      <td>{provider.telephone}</td>
-                      <td>{provider.direction}</td>
-                      <td>{provider.email}</td>
+                  {this.state.clients.map((client) => (
+                    <tr id={client.id} key={client.id}>
+                      <td>{client.identificationCard}</td>
+                      <td>{client.name}</td>
+                      <td>{client.surname}</td>
+                      <td>{client.telephone}</td>
+                      <td>{client.email}</td>
                       <td>
                         <button
                           class="btn btn-outline-warning"

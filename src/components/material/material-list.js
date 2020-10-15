@@ -1,30 +1,31 @@
 import React, { Component } from "react";
 import Swal from "sweetalert2";
-import { getProviders } from "../../services/providerService";
+import { getMaterials } from "../../services/materialService";
+//import { getProviders } from "../../services/providerService";
 
-export default class providerList extends Component {
+export default class materialList extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      providers: null,
+      materials: null,
       isLoading: null,
     };
   }
 
   componentDidMount() {
-    this.getProviders();
+    this.getMaterials();
   }
 
-  async getProviders() {
-    if (!this.state.providers) {
+  async getMaterials() {
+    if (!this.state.materials) {
       this.setState({ isLoading: true });
 
-      const resp = await getProviders("provider");
+      const resp = await getMaterials("material");
 
       if (resp.status === "success") {
         console.log(resp);
-        this.setState({ providers: resp.data, isLoading: false });
+        this.setState({ materials: resp.data, isLoading: false });
       } else {
         Swal.fire("Error", resp.message, "error");
       }
@@ -34,11 +35,11 @@ export default class providerList extends Component {
   render() {
     return (
       <div>
-        {this.state.isLoading && <span>Cargando proveedores</span>}
+        {this.state.isLoading && <span>Cargando materiales</span>}
 
-        {this.state.providers && (
+        {this.state.materials && (
           <div>
-            <h3 class="text-center">Proveedores</h3>
+            <h3 class="text-center">Materiales</h3>
 
             <button
               type="button"
@@ -62,7 +63,7 @@ export default class providerList extends Component {
                 <div class="modal-content">
                   <div class="modal-header">
                     <h6 class="modal-title" id="exampleModalScrollableTitle">
-                      Agregar Proveedor
+                      Agregar Material
                     </h6>
                     <button
                       type="button"
@@ -76,6 +77,16 @@ export default class providerList extends Component {
                   <div class="modal-body">
                     <form>
                       <div class="form-group">
+                        <label for="idproveedor">Código de Proveedor</label>
+                        <input
+                          name="idproveedor"
+                          type="text"
+                          class="form-control"
+                          id="idproveedor"
+                        ></input>
+                      </div>
+
+                      <div class="form-group">
                         <label for="nombre">Nombre</label>
                         <input
                           name="nombre"
@@ -86,44 +97,26 @@ export default class providerList extends Component {
                       </div>
 
                       <div class="form-group">
-                        <label for="apellido">Apellido</label>
+                        <label for="precio">Precio</label>
                         <input
-                          name="apellido"
-                          type="text"
-                          class="form-control"
-                          id="apellido"
-                        ></input>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="telefono">Teléfono</label>
-                        <input
-                          name="telefono"
+                          name="precio"
                           type="number"
                           class="form-control"
-                          id="telefono"
+                          id="precio"
                         ></input>
                       </div>
 
                       <div class="form-group">
-                        <label for="direction">Dirección</label>
+                        <label for="descripcion">Descripción</label>
                         <input
-                          name="direction"
+                          name="descripcion"
                           type="text"
                           class="form-control"
-                          id="direction"
+                          id="descripcion"
                         ></input>
                       </div>
 
-                      <div class="form-group">
-                        <label for="email">Correo Electrónico</label>
-                        <input
-                          name="email"
-                          type="text"
-                          class="form-control"
-                          id="email"
-                        ></input>
-                      </div>
+
 
 
 
@@ -147,7 +140,7 @@ export default class providerList extends Component {
                 <div class="modal-content">
                   <div class="modal-header">
                     <h6 class="modal-title" id="exampleModalScrollableTitle">
-                      Editar Producto
+                      Editar Material
                     </h6>
                     <button
                       type="button"
@@ -161,6 +154,16 @@ export default class providerList extends Component {
                   <div class="modal-body">
                     <form>
                       
+                    <div class="form-group">
+                        <label for="idproveedor">Código de Proveedor</label>
+                        <input
+                          name="idproveedor"
+                          type="text"
+                          class="form-control"
+                          id="idproveedor"
+                        ></input>
+                      </div>
+
                       <div class="form-group">
                         <label for="nombre">Nombre</label>
                         <input
@@ -172,42 +175,22 @@ export default class providerList extends Component {
                       </div>
 
                       <div class="form-group">
-                        <label for="apellido">Apellido</label>
+                        <label for="precio">Precio</label>
                         <input
-                          name="apellido"
-                          type="text"
-                          class="form-control"
-                          id="apellido"
-                        ></input>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="telefono">Teléfono</label>
-                        <input
-                          name="telefono"
+                          name="precio"
                           type="number"
                           class="form-control"
-                          id="telefono"
+                          id="precio"
                         ></input>
                       </div>
 
                       <div class="form-group">
-                        <label for="direccion">Dirección</label>
+                        <label for="descripcion">Descripción</label>
                         <input
-                          name="direccion"
+                          name="descripcion"
                           type="text"
                           class="form-control"
-                          id="direccion"
-                        ></input>
-                      </div>
-
-                      <div class="form-group">
-                        <label for="email">Correo Electrónico</label>
-                        <input
-                          name="email"
-                          type="text"
-                          class="form-control"
-                          id="email"
+                          id="descripcion"
                         ></input>
                       </div>
 
@@ -242,11 +225,11 @@ export default class providerList extends Component {
               <table id="tabla" class="table table-hover">
                 <thead>
                   <tr>
+                    <th scope="col">Código</th>
                     <th scope="col">Nombre</th>
-                    <th scope="col">Apellido</th>
-                    <th scope="col">Teléfono</th>
-                    <th scope="col">Dirección</th>
-                    <th scope="col">Correo Electrónico</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Descripción</th>
 
 
 
@@ -254,13 +237,13 @@ export default class providerList extends Component {
                   </tr>
                 </thead>
                 <tbody id="datosT">
-                  {this.state.providers.map((provider) => (
-                    <tr id={provider.id} key={provider.id}>
-                      <td>{provider.name}</td>
-                      <td>{provider.surname}</td>
-                      <td>{provider.telephone}</td>
-                      <td>{provider.direction}</td>
-                      <td>{provider.email}</td>
+                  {this.state.materials.map((material) => (
+                    <tr id={material.id} key={material.id}>
+                      <td>{material.id}</td>
+                      <td>{material.name}</td>
+                      <td>{material.price}</td>
+                      <td>{material.amount}</td>
+                      <td>{material.description}</td>
                       <td>
                         <button
                           class="btn btn-outline-warning"
