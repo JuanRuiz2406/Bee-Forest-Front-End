@@ -4,8 +4,10 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
 } from "react-router-dom";
+
+import productList from './components/product/product-list'
+
 import RowTickets from './components/RowTicket';
 
 function App() {
@@ -67,6 +69,8 @@ function App() {
           <Route path="/algo">
             Algo
           </Route>
+
+          <Route exact path="/productos" component={productList}/>
         </Switch>
       </div>
     </Router>
