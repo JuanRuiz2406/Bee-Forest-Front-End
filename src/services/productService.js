@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { param } from 'jquery';
 
 const baseUrl = process.env.REACT_APP_API_URL;
 
@@ -13,8 +12,6 @@ export const storeProducts = ( endpoint, product ) => { // por el momento solo u
  
     let json = JSON.stringify(product);
     let params = "json=" + json;
-
-    console.log(params);
 
     return axios.post( `${ baseUrl }/${ endpoint }`, params, { headers: {'Authorization': token}} )
     .then(response => {
