@@ -26,6 +26,24 @@ export const storeProducts = ( endpoint, product ) => { // por el momento solo u
     });            
 }
 
+export const uploadProduct = ( endpoint, file0 ) => { // por el momento solo un parametro luego tendremos que mandar el token
+    
+    let formData = new FormData();
+
+    formData.append("file0", file0);
+
+    return axios.post( `${ baseUrl }/${ endpoint }`, formData, { headers: {"Content-Type": "multipart/form-data",'Authorization': token}} )
+    .then(response => {
+        
+    return response.data;
+
+    })
+
+    .catch(error => {
+        console.log(error);
+        return error;
+    });            
+}
 
 export const getProducts = ( endpoint ) => { // por el momento solo un parametro luego tendremos que mandar el token
  

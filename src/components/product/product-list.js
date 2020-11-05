@@ -1,152 +1,195 @@
 import React, { Component } from "react";
 import Swal from "sweetalert2";
-import { getProducts, storeProducts } from "../../services/productService";
+import {
+  getProducts,
+  storeProducts,
+  uploadProduct,
+} from "../../services/productService";
 import { getCategory } from "../../services/categoryService";
 
 export default class productList extends Component {
-    
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        this.onChangeCategoryName = this.onChangeCategoryName.bind(this);
-        this.getCategoryName = this.getCategoryName.bind(this);
-        this.onChangeName = this.onChangeName.bind(this);
-        this.onChangePrice = this.onChangePrice.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
+    this.onChangeCategoryName = this.onChangeCategoryName.bind(this);
+    this.getCategoryName = this.getCategoryName.bind(this);
+    this.onChangeName = this.onChangeName.bind(this);
+    this.onChangePrice = this.onChangePrice.bind(this);
+    this.selectFile = this.selectFile.bind(this);
+    this.create = this.create.bind(this);
+    this.update = this.update.bind(this);
+    this.delete = this.delete.bind(this);
+    this.uploadImage = this.uploadImage.bind(this);
+    this.replaceModalProduct = this.replaceModalProduct.bind(this);
 
+    this.state = {
+      products: null,
+      isLoading: null,
 
-        this.state = {
-        products: null,
-        isLoading: null,
+      selectedFiles: undefined,
+      requiredItem: 0,
+      
+      currentProduct: {
+        categoryId: null,
+        categoryName: "",
+        name: "",
+        price: "",
+        description: "",
+        image: "",
+      },
+      message: "",
+    };
+  }
 
+  componentDidMount() {
+    this.getProducts();
+  }
+
+  replaceModalProduct(index) {
+    this.setState({
+      requiredItem: index
+    });
+  }
+
+   /*
+  saveModalDetails(item) {
+    const requiredItem = this.state.requiredItem;
+    let tempbrochure = this.state.brochure;
+    tempbrochure[requiredItem] = item;
+    this.setState({ brochure: tempbrochure });
+  }
+ 
+  deleteProduct(index) {
+    let tempBrochure = this.state.brochure;
+    tempBrochure.splice(index, 1);
+    this.setState({ brochure: tempBrochure });
+  }
+  */
+
+  onChangeCategoryName(e) {
+    const categoryName = e.target.value;
+
+    this.setState((prevState) => ({
+      currentProduct: {
+        ...prevState.currentProduct,
+        categoryName: categoryName,
+      },
+    }));
+  }
+
+  onChangeDescription(e) {
+    this.setState((prevState) => ({
+      currentProduct: {
+        ...prevState.currentProduct,
+        description: e.description,
+      },
+    }));
+  }
+
+  onChangeName(e) {
+    this.setState((prevState) => ({
+      currentProduct: {
+        ...prevState.currentProduct,
+        name: e.name,
+      },
+    }));
+  }
+
+  onChangePrice(e) {
+    this.setState((prevState) => ({
+      currentProduct: {
+        ...prevState.currentProduct,
+        price: e.price,
+      },
+    }));
+  }
+
+  async getCategoryName(e) {
+    const categoryName = e.target.value;
+
+    e.preventDefault();
+
+    const resp = await getCategory("category", categoryName);
+
+    if (resp.status === "success") {
+      console.log(resp.data[0].id);
+      this.setState((prevState) => ({
         currentProduct: {
-            categoryId: null,
-            categoryName: "",
-            name: "",
-            price: "",
-            description: "",
-            image:"No Image"
-          },
-          message: ""
-        };
+          ...prevState.currentProduct,
+          categoryId: resp.data[0].id,
+        },
+      }));
+    } else {
+      Swal.fire("Oops", "No se encontro dicha categoria", "error");
     }
+  }
 
-    componentDidMount() {
-        this.getProducts();
-    }
-    
-     onChangeCategoryName(e) {
+  async getProducts() {
+    if (!this.state.products) {
+      this.setState({ isLoading: true });
 
-        const categoryName = e.target.value;
-
-            this.setState(prevState => ({
-                currentProduct: {
-                ...prevState.currentProduct,
-                categoryName: categoryName
-              }
-            }));
-
-    }
-
-    onChangeDescription(e) {
-       
-        this.setState(prevState => ({
-            currentProduct: {
-            ...prevState.currentProduct,
-            description: e.description
-          }
-        }));
-     }
-
-    onChangeName(e) {
-        
-        this.setState(prevState => ({
-            currentProduct: {
-            ...prevState.currentProduct,
-            name: e.name
-          }
-        }));
-     }
-
-     onChangePrice(e) {
-        
-        this.setState(prevState => ({
-            currentProduct: {
-            ...prevState.currentProduct,
-            price: e.price
-          }
-        }));
-     }
-
-    
-
-    async getCategoryName(e) {
-       
-        const categoryName = e.target.value;
-
-        e.preventDefault();
-
-        const resp = await getCategory("category", categoryName);
-
-        if (resp.status === "success") {
-            console.log(resp.data[0].id);
-            this.setState(prevState => ({
-                currentProduct: {
-                ...prevState.currentProduct,
-                categoryId : resp.data[0].id
-              }
-            }));
-        } else {
-            Swal.fire("Oops", 'No se encontro dicha categoria', "error");
-        }
-     
-    }
-
-    async getProducts() {
-
-        if (!this.state.products) {
-            this.setState({ isLoading: true });
-
-                const resp = await getProducts("product");
-                console.log(resp);
-                if (resp.status === "success") {
-                    console.log(resp);
-                    this.setState({ products: resp.data, isLoading: false });
-                } else {
-                    Swal.fire("Error", resp.message, "error");
-                }
-        }
-    }
-
-     refreshPage() {
-        window.location.reload();
+      const resp = await getProducts("product");
+      console.log(resp);
+      if (resp.status === "success") {
+        console.log(resp);
+        this.setState({ products: resp.data, isLoading: false });
+      } else {
+        Swal.fire("Error", resp.message, "error");
       }
-    async create() {
-
-        const resp = await storeProducts("product", this.state.currentProduct);
-
-        if (resp.status === "success") {
-            console.log(resp);
-            this.refreshPage();
-            
-        } else {
-            Swal.fire("Error", resp.message, "error");
-        }
-
     }
-    update(e) {
-        // update entity - PUT
-        e.preventDefault();
-    }
-    delete(e) {
-        // delete entity - DELETE
-        e.preventDefault();
-    }
+  }
 
+  refreshPage() {
+    window.location.reload();
+  }
+  async create() {
+    const resp = await storeProducts("product", this.state.currentProduct);
+
+    if (resp.status === "success") {
+      console.log(resp);
+      this.refreshPage();
+    } else {
+      Swal.fire("Error", resp.message, "error");
+    }
+  }
+
+  update(e) {
+    // update entity - PUT
+    e.preventDefault();
+  }
+
+  delete(e) {
+    // delete entity - DELETE
+    e.preventDefault();
+  }
+
+  selectFile(e) {
+    e.preventDefault();
+    this.setState({
+      selectedFiles: e.target.files,
+    });
+
+    console.log(this.state);
+  }
+
+  async uploadImage(e) {
+    e.preventDefault();
+    const resp = await uploadProduct(
+      `product/upload/${this.state.products[this.state.requiredItem].id}`,
+      this.state.selectedFiles[0]
+    );
+
+    if (resp.status === "success") {
+
+      console.log(resp);
+    } else {
+      Swal.fire("Error", resp.message, "error");
+    }
+  }
   render() {
-    const { currentProduct } = this.state;
+
+    const { currentProduct, selectedFiles } = this.state;
+
     return (
       <div>
         {this.state.isLoading && <span>Cargando productos</span>}
@@ -172,10 +215,16 @@ export default class productList extends Component {
               aria-labelledby="exampleModalScrollableTitle"
               aria-hidden="true"
             >
-              <div className="modal-dialog modal-dialog-scrollable" role="document">
+              <div
+                className="modal-dialog modal-dialog-scrollable"
+                role="document"
+              >
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h6 className="modal-title" id="exampleModalScrollableTitle">
+                    <h6
+                      className="modal-title"
+                      id="exampleModalScrollableTitle"
+                    >
                       Agregar Producto
                     </h6>
                     <button
@@ -196,11 +245,10 @@ export default class productList extends Component {
                           type="text"
                           className="form-control"
                           id="nombre"
-
                           value={currentProduct.name}
-
-                          onChange={(e) => this.onChangeName({ name: e.target.value })}
-
+                          onChange={(e) =>
+                            this.onChangeName({ name: e.target.value })
+                          }
                         ></input>
                       </div>
 
@@ -211,10 +259,10 @@ export default class productList extends Component {
                           type="number"
                           className="form-control"
                           id="precio"
-                          
                           value={currentProduct.price}
-                          onChange={(e) => this.onChangePrice({ price: e.target.value })}
-
+                          onChange={(e) =>
+                            this.onChangePrice({ price: e.target.value })
+                          }
                         ></input>
                       </div>
 
@@ -225,10 +273,12 @@ export default class productList extends Component {
                           type="text"
                           className="form-control"
                           id="description"
-                          
                           value={currentProduct.description}
-                          onChange={(e) => this.onChangeDescription({ description: e.target.value })}
-
+                          onChange={(e) =>
+                            this.onChangeDescription({
+                              description: e.target.value,
+                            })
+                          }
                         ></input>
                       </div>
 
@@ -238,16 +288,16 @@ export default class productList extends Component {
                           name="categoria"
                           type="categoria"
                           className="form-control"
-                          value= {currentProduct.categoryName}
+                          value={currentProduct.categoryName}
                           onChange={this.onChangeCategoryName}
                         ></input>
 
                         <button
-                        className="badge badge-success mr-2"
-                        value= {currentProduct.categoryName}
-                        onClick={this.getCategoryName}
+                          className="badge badge-success mr-2"
+                          value={currentProduct.categoryName}
+                          onClick={this.getCategoryName}
                         >
-                        Buscar
+                          Buscar
                         </button>
                       </div>
                     </form>
@@ -277,15 +327,20 @@ export default class productList extends Component {
             <div
               className="modal fade"
               id="ModalEditar"
- 
               role="dialog"
               aria-labelledby="exampleModalScrollableTitle"
               aria-hidden="true"
             >
-              <div className="modal-dialog modal-dialog-scrollable" role="document">
+              <div
+                className="modal-dialog modal-dialog-scrollable"
+                role="document"
+              >
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h6 className="modal-title" id="exampleModalScrollableTitle">
+                    <h6
+                      className="modal-title"
+                      id="exampleModalScrollableTitle"
+                    >
                       Editar Producto
                     </h6>
                     <button
@@ -300,21 +355,16 @@ export default class productList extends Component {
                   <div className="modal-body">
                     <form>
                       <div className="form-group">
-                        <input
-                          name="codigoProductou"
-                          hidden=""
-                          type="text"
-                          className="form-control"
-                          id="codigoProductou"
-                        ></input>
-                      </div>
-                      <div className="form-group">
                         <label htmlFor="nombre">Nombre</label>
                         <input
                           name="nombre"
                           type="text"
                           className="form-control"
                           id="nombreu"
+                          value = { this.state.products.length > 0 && this.state.products[this.state.requiredItem].name }
+                          onChange={(e) =>
+                            this.onChangeName({ name : e.target.value })
+                          }
                         ></input>
                       </div>
                       <div className="form-group">
@@ -324,35 +374,58 @@ export default class productList extends Component {
                           type="number"
                           className="form-control"
                           id="preciou"
+                          value = { this.state.products.length > 0 && this.state.products[this.state.requiredItem].price }
+                          onChange={(e) =>
+                            this.onChangePrice({ price : e.target.value })
+                          }
                         ></input>
                       </div>
+
                       <div className="form-group">
-                        <label htmlFor="cantidad">Cantidad</label>
+                        <label htmlFor="description">Descripcion</label>
                         <input
-                          name="cantidad"
-                          type="number"
-                          className="form-control"
-                          id="cantidadu"
-                        ></input>
-                      </div>
-                      <div className="form-group">
-                        <label htmlFor="categorias">Tipo de Producto</label>
-                        <input
-                          disabled
-                          name="categoria"
+                          name="description"
                           type="text"
                           className="form-control"
-                          id="categoriasu"
+                          id="description"
+                          value = { this.state.products.length > 0 && this.state.products[this.state.requiredItem].description }
+                          onChange={(e) =>
+                            this.onChangeDescription({
+                              description: e.target.value,
+                            })
+                          }
                         ></input>
                       </div>
+           
                       <div className="form-group">
-                        <label htmlFor="file">Fotografia</label>
+                        <label htmlFor="categoria">Categoria</label>
                         <input
-                          type="file"
-                          className="form-control-file"
-                          id="photou"
+                          name="categoria"
+                          type="categoria"
+                          className="form-control"
+                          value={currentProduct.categoryName}
+                          onChange={this.onChangeCategoryName}
                         ></input>
+
+                        <button
+                          className="badge badge-success mr-2"
+                          value={currentProduct.categoryName}
+                          onClick={this.getCategoryName}
+                        >
+                          Buscar
+                        </button>
                       </div>
+                      <label className="btn btn-default">
+                        <input type="file" onChange={this.selectFile} />
+                      </label>
+
+                      <button
+                        className="btn btn-success"
+                        disabled={!selectedFiles}
+                        onClick={this.uploadImage}
+                      >
+                        subir
+                      </button>
                     </form>
                   </div>
                   <div className="modal-footer">
@@ -383,19 +456,18 @@ export default class productList extends Component {
                     <th scope="col">ID</th>
                     <th scope="col">Imagen</th>
                     <th scope="col">Nombre</th>
-                    <th scope="col">Cantidad</th>
                     <th scope="col">Precio</th>
                     <th scope="col">Descripción</th>
                     <th scope="col">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="datosT">
-                  {this.state.products.map((product) => (
-                    <tr id={product.id} key={product.id}>
+                  {this.state.products.map(( product, index) => (
+                    <tr key={product.id}>
                       <td>{product.id}</td>
-                      <td>{product.image}</td>
+                      {this.state.products[index].image ? <td > <img className="img" src={`http://127.0.0.1:8000/api/product/image/${product.image}`} width="200" height="200"></img></td>: 
+                      <td > No image</td>}
                       <td>{product.name}</td>
-                      <td>{product.amount}</td>
                       <td>{product.price}</td>
                       <td>{product.description}</td>
                       <td>
@@ -403,11 +475,14 @@ export default class productList extends Component {
                           className="btn btn-outline-warning"
                           data-toggle="modal"
                           data-target="#ModalEditar"
+                          onClick={() => this.replaceModalProduct(index)}
                         >
-                          <i className="fas fa-edit">Editar</i>
+                          editar
                         </button>
-                        <button className="btn btn-outline-danger">
-                          <i className="fas fa-trash-alt">Eliminar</i>
+                        <button
+                          className="btn btn-outline-danger"
+                        >
+                          Eliminar
                         </button>
                       </td>
                     </tr>
@@ -419,5 +494,6 @@ export default class productList extends Component {
         )}
       </div>
     );
+    
   }
 }
