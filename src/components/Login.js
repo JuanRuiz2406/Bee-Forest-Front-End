@@ -7,18 +7,18 @@ class Login extends React.Component{
             <div className="container">
                 <div>
                     <img id="logo" src={beeforest} alt=""/>
-                    <h1 class="text-center">Bee Forest</h1>
+                    <h1 className="text-center">Bee Forest</h1>
                 </div>
 
                 <div className="login">
                     <div className="form">
                         <h2>Iniciar sesión</h2><br/>
                         <p>Nombre de usuario: </p>
-                        <input class="form-control" type="text" name="username"/><br/>
+                        <input className="form-control" type="text" name="username"/><br/>
                         <p>Contraseña: </p>
-                        <input class="form-control" type="password" name="password"/>
-                        <p class="center"></p>
-                        <input type="submit" style={{background: "#E6A500"}} class="btn btn-light text-white" value="Iniciar Sesión"/>
+                        <input className="form-control" type="password" name="password"/>
+                        <p className="center"></p>
+                        <input type="submit" style={{background: "#E6A500"}} className="btn btn-light text-white" value="Iniciar Sesión"/>
                     </div>
                 </div>
             </div>

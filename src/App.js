@@ -14,22 +14,24 @@ import clientList from './components/client/client-list'
 import Login from './components/Login';
 import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
+import shippingList from './components/shipping/shipping-list'
 
 function App() {
   return (
     <Router>
       <div className="container">
         <Switch>
-          <Route path="/login">
+          <Route path="/login" exact>
             <Login/>
           </Route>
           <Route path="/home">
             <Navbar/>
             <Route path="/home/pedidos" component={RowTickets}/>
-            <Route path="/home/productos" component={productList}/>
+            <Route path="/home/productos"  component={productList}/>
             <Route path="/home/proveedores" component={providerList}/>
             <Route path="/home/materiales" component={materialList}/>
             <Route path="/home/clientes" component={clientList}/>
+            <Route path="/home/envios" component={shippingList}/>
           </Route>
           <Route path="/algo">
             <Link to="/home/productos" className="btn btn-primary">Hola</Link>

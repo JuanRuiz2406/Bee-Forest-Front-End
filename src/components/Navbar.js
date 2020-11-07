@@ -43,7 +43,7 @@ class Navbar extends React.Component{
                           <div className="dropdown-menu" _mstvisible="0">
                             <Link to="/home/pedidos" className="dropdown-item">Pedidos</Link>
                             <Link to="/home/devoluciones" className="dropdown-item">Devoluciones</Link>
-                            <Link to="/home/tipos-de-envio" className="dropdown-item">Tipos de Envio</Link>
+                            <Link to="/home/envios" className="dropdown-item">Tipos de Envio</Link>
                           </div>
                         </li>
                         </ul>
