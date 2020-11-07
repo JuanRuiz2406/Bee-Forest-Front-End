@@ -17,6 +17,7 @@ export default class shippingList extends Component {
 
         this.state = {
             shippings: null,
+            shipping: null,
             isLoading: null,
 
             requiredItem: 0,
@@ -31,9 +32,9 @@ export default class shippingList extends Component {
         };
     }
 
-    replaceModalShipping(index) {
+    replaceModalShipping(shippings) {
         this.setState({
-            requiredItem: index
+            currentShipping: shippings
         });
     }
 
@@ -256,7 +257,7 @@ export default class shippingList extends Component {
                                     type="text"
                                     className="form-control"
                                     id="nombreu"
-                                    value={ this.state.shippings.length > 0 && this.state.shippings[this.state.requiredItem].name}
+                                    value={ this.state.currentShipping.name }
                                     onChange={(e) => 
                                         this.onChangeName({ name: e.target.value })
                                     }
@@ -270,7 +271,7 @@ export default class shippingList extends Component {
                                     type="number"
                                     className="form-control"
                                     id="priceu"
-                                    value={ this.state.shippings.length > 0 && this.state.shippings[this.state.requiredItem].price}
+                                    value={ this.state.currentShipping.price }
                                     onChange={(e) => 
                                         this.onChangePrice({ price: e.target.value })
                                     }
@@ -284,7 +285,7 @@ export default class shippingList extends Component {
                                     type="text"
                                     className="form-control"
                                     id="descripcionu"
-                                    value={ this.state.shippings.length > 0 && this.state.shippings[this.state.requiredItem].description}
+                                    value={this.state.currentShipping.description }
                                     onChange={(e) => 
                                         this.onChangeDescription({ description: e.target.value })
                                     }
@@ -327,7 +328,7 @@ export default class shippingList extends Component {
                                     </tr>
                                 </thead>
                                 <tbody id="datosT">
-                                    {this.state.shippings.map((shippings, index) =>(
+                                    {this.state.shippings.map((shippings) =>(
                                         <tr id={shippings.id} key={shippings.id}>
                                             <th>{shippings.name}</th>
                                             <th>{shippings.price}</th>
@@ -337,10 +338,10 @@ export default class shippingList extends Component {
                                                 className="btn btn-outline-warning"
                                                 data-toggle="modal"
                                                 data-target="#ModalEditar"
-                                                onClick={() => this.replaceModalShipping(index)}
+                                                onClick={() => this.replaceModalShipping(shippings)}
                                                 >
                                                 <i className="fas fa-edit">Editar</i>
-                                            </button>
+                                            </button>{"    "}
                                             <button className="btn btn-outline-danger">
                                                 <i className="fas fa-trash-alt">Eliminar</i>
                                             </button>

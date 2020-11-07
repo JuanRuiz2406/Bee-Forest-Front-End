@@ -33,11 +33,12 @@ export const getShipping = ( endpoint ) => {
     })
 }
 
-export const updateShipping = ( endpoint, file0 ) => {
+export const updateShipping = ( endpoint, shipping, id ) => {
 
-    let formData = new FormData();
+    let json = JSON.stringify(shipping);
+    let params = "json=" + json;
 
-    return axios.post(`${ baseUrl }/${ endpoint }`, formData, { headers: {"Content-Type": "multipart/form-data",'Authorization': token}} )
+    return axios.put(`${ baseUrl }/${ endpoint }/${ id }`, params, { headers: {"Content-Type": "multipart/form-data",'Authorization': token}} )
     .then(response => {
 
         return response.data;
