@@ -15,7 +15,40 @@ export const storeProducts = ( endpoint, product ) => { // por el momento solo u
 
     return axios.post( `${ baseUrl }/${ endpoint }`, params, { headers: {'Authorization': token}} )
     .then(response => {
-        
+        console.log(response);
+    return response.data;
+
+    })
+
+    .catch(error => {
+        console.log(error);
+        return error;
+    });            
+}
+
+export const updateProducts = ( endpoint, product ) => { // por el momento solo un parametro luego tendremos que mandar el token
+ 
+    let json = JSON.stringify(product);
+    let params = "json=" + json;
+
+    return axios.put( `${ baseUrl }/${ endpoint }`, params, { headers: {'Authorization': token}} )
+    .then(response => {
+        console.log(response);
+    return response.data;
+
+    })
+
+    .catch(error => {
+        console.log(error);
+        return error;
+    });            
+}
+
+export const deleteProducts = ( endpoint ) => { // por el momento solo un parametro luego tendremos que mandar el token
+ 
+    return axios.delete( `${ baseUrl }/${ endpoint }`, { headers: {'Authorization': token}} )
+    .then(response => {
+        console.log(response);
     return response.data;
 
     })

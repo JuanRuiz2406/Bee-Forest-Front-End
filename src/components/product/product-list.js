@@ -4,6 +4,8 @@ import {
   getProducts,
   storeProducts,
   uploadProduct,
+  updateProducts,
+  deleteProducts,
 } from "../../services/productService";
 import { getCategory } from "../../services/categoryService";
 
@@ -15,6 +17,7 @@ export default class productList extends Component {
     this.getCategoryName = this.getCategoryName.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onChangePrice = this.onChangePrice.bind(this);
+    this.onChangeAmount = this.onChangeAmount.bind(this);
     this.selectFile = this.selectFile.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
@@ -27,13 +30,15 @@ export default class productList extends Component {
       isLoading: null,
 
       selectedFiles: undefined,
+      categoryExist: undefined,
       requiredItem: 0,
-      
+
       currentProduct: {
         categoryId: null,
         categoryName: "",
         name: "",
         price: "",
+        amount: "",
         description: "",
         image: "",
       },
@@ -45,28 +50,15 @@ export default class productList extends Component {
     this.getProducts();
   }
 
-  replaceModalProduct(index) {
+  replaceModalProduct(index, product) {
     this.setState({
-      requiredItem: index
+      requiredItem: index,
+      currentProduct: product,
     });
   }
 
-   /*
-  saveModalDetails(item) {
-    const requiredItem = this.state.requiredItem;
-    let tempbrochure = this.state.brochure;
-    tempbrochure[requiredItem] = item;
-    this.setState({ brochure: tempbrochure });
-  }
- 
-  deleteProduct(index) {
-    let tempBrochure = this.state.brochure;
-    tempBrochure.splice(index, 1);
-    this.setState({ brochure: tempBrochure });
-  }
-  */
-
   onChangeCategoryName(e) {
+    e.preventDefault();
     const categoryName = e.target.value;
 
     this.setState((prevState) => ({
@@ -104,21 +96,41 @@ export default class productList extends Component {
     }));
   }
 
+  onChangeAmount(e) {
+    this.setState((prevState) => ({
+      currentProduct: {
+        ...prevState.currentProduct,
+        amount: e.amount,
+      },
+    }));
+  }
+
   async getCategoryName(e) {
-    const categoryName = e.target.value;
-
     e.preventDefault();
-
-    const resp = await getCategory("category", categoryName);
+    if (this.state.currentProduct.categoryName === "") {
+      this.state.currentProduct.categoryName = "no exist";
+    }
+    const resp = await getCategory(
+      "category",
+      this.state.currentProduct.categoryName
+    );
 
     if (resp.status === "success") {
       console.log(resp.data[0].id);
+      this.state.categoryExist = true;
       this.setState((prevState) => ({
         currentProduct: {
           ...prevState.currentProduct,
           categoryId: resp.data[0].id,
+          image: "",
         },
       }));
+
+      Swal.fire({
+        icon: "success",
+        title: `Nombre de la categoria ${resp.data[0].name}`,
+        timer: 1500,
+      });
     } else {
       Swal.fire("Oops", "No se encontro dicha categoria", "error");
     }
@@ -129,9 +141,7 @@ export default class productList extends Component {
       this.setState({ isLoading: true });
 
       const resp = await getProducts("product");
-      console.log(resp);
       if (resp.status === "success") {
-        console.log(resp);
         this.setState({ products: resp.data, isLoading: false });
       } else {
         Swal.fire("Error", resp.message, "error");
@@ -145,6 +155,8 @@ export default class productList extends Component {
   async create() {
     const resp = await storeProducts("product", this.state.currentProduct);
 
+    console.log(this.state.currentProduct);
+
     if (resp.status === "success") {
       console.log(resp);
       this.refreshPage();
@@ -153,14 +165,46 @@ export default class productList extends Component {
     }
   }
 
-  update(e) {
+  async update(e) {
     // update entity - PUT
     e.preventDefault();
+
+    console.log(this.state.currentProduct);
+
+    const resp = await updateProducts(
+      `product/${this.state.currentProduct.id}`,
+      this.state.currentProduct
+    );
+
+    if (resp.status === "success") {
+      console.log(resp);
+      this.refreshPage();
+    } else {
+      Swal.fire("Error", resp.message, "error");
+    }
   }
 
-  delete(e) {
-    // delete entity - DELETE
-    e.preventDefault();
+  async delete(productId) {
+    // delete entity - DELET
+    let d = false;
+    await Swal.fire({
+      title: "Esta seguro?",
+      text: "Se eliminaran todos los datos relacionados con este producto",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, eliminar!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        d = true;
+      }
+    });
+
+    if (d) {
+      await deleteProducts(`product/${productId}`);
+      this.refreshPage();
+    }
   }
 
   selectFile(e) {
@@ -180,15 +224,18 @@ export default class productList extends Component {
     );
 
     if (resp.status === "success") {
-
       console.log(resp);
+      Swal.fire({
+        icon: "success",
+        title: `Imagen subida`,
+        timer: 1500,
+      });
     } else {
       Swal.fire("Error", resp.message, "error");
     }
   }
   render() {
-
-    const { currentProduct, selectedFiles } = this.state;
+    const { currentProduct, selectedFiles, categoryExist } = this.state;
 
     return (
       <div>
@@ -203,6 +250,9 @@ export default class productList extends Component {
               className="btn btn-dark text-white"
               data-toggle="modal"
               data-target="#exampleModalScrollable"
+              onClick={() => {
+                this.setState({ currentProduct: null });
+              }}
             >
               Agregar
             </button>
@@ -245,7 +295,9 @@ export default class productList extends Component {
                           type="text"
                           className="form-control"
                           id="nombre"
-                          value={currentProduct.name}
+                          value={
+                            currentProduct ? currentProduct.name || "" : ""
+                          }
                           onChange={(e) =>
                             this.onChangeName({ name: e.target.value })
                           }
@@ -259,7 +311,9 @@ export default class productList extends Component {
                           type="number"
                           className="form-control"
                           id="precio"
-                          value={currentProduct.price}
+                          value={
+                            currentProduct ? currentProduct.price || "" : ""
+                          }
                           onChange={(e) =>
                             this.onChangePrice({ price: e.target.value })
                           }
@@ -273,7 +327,11 @@ export default class productList extends Component {
                           type="text"
                           className="form-control"
                           id="description"
-                          value={currentProduct.description}
+                          value={
+                            currentProduct
+                              ? currentProduct.description || ""
+                              : ""
+                          }
                           onChange={(e) =>
                             this.onChangeDescription({
                               description: e.target.value,
@@ -288,14 +346,19 @@ export default class productList extends Component {
                           name="categoria"
                           type="categoria"
                           className="form-control"
-                          value={currentProduct.categoryName}
-                          onChange={this.onChangeCategoryName}
+                          value={
+                            currentProduct
+                              ? currentProduct.categoryName || ""
+                              : ""
+                          }
+                          onChange={this.onChangeCategoryName || ""}
                         ></input>
 
                         <button
                           className="badge badge-success mr-2"
-                          value={currentProduct.categoryName}
-                          onClick={this.getCategoryName}
+                          onClick={
+                            currentProduct ? this.getCategoryName || null : null
+                          }
                         >
                           Buscar
                         </button>
@@ -307,6 +370,12 @@ export default class productList extends Component {
                       type="button"
                       className="btn btn-secondary"
                       data-dismiss="modal"
+                      onClick={() => {
+                        this.setState({
+                          currentProduct: null,
+                          categoryExist: undefined,
+                        });
+                      }}
                     >
                       Cerrar
                     </button>
@@ -317,6 +386,7 @@ export default class productList extends Component {
                       className="btn btn-primary"
                       value="Agregar"
                       data-dismiss="modal"
+                      disabled={!categoryExist}
                       onClick={this.create}
                     ></input>
                   </div>
@@ -361,9 +431,11 @@ export default class productList extends Component {
                           type="text"
                           className="form-control"
                           id="nombreu"
-                          value = { this.state.products.length > 0 && this.state.products[this.state.requiredItem].name }
+                          value={
+                            currentProduct ? currentProduct.name || "" : ""
+                          }
                           onChange={(e) =>
-                            this.onChangeName({ name : e.target.value })
+                            this.onChangeName({ name: e.target.value })
                           }
                         ></input>
                       </div>
@@ -374,9 +446,27 @@ export default class productList extends Component {
                           type="number"
                           className="form-control"
                           id="preciou"
-                          value = { this.state.products.length > 0 && this.state.products[this.state.requiredItem].price }
+                          value={
+                            currentProduct ? currentProduct.price || "" : ""
+                          }
                           onChange={(e) =>
-                            this.onChangePrice({ price : e.target.value })
+                            this.onChangePrice({ price: e.target.value })
+                          }
+                        ></input>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="amount">Cantidad</label>
+                        <input
+                          name="amount"
+                          type="number"
+                          className="form-control"
+                          id="amount"
+                          value={
+                            currentProduct ? currentProduct.amount || "" : ""
+                          }
+                          onChange={(e) =>
+                            this.onChangeAmount({ amount: e.target.value })
                           }
                         ></input>
                       </div>
@@ -388,7 +478,11 @@ export default class productList extends Component {
                           type="text"
                           className="form-control"
                           id="description"
-                          value = { this.state.products.length > 0 && this.state.products[this.state.requiredItem].description }
+                          value={
+                            currentProduct
+                              ? currentProduct.description || ""
+                              : ""
+                          }
                           onChange={(e) =>
                             this.onChangeDescription({
                               description: e.target.value,
@@ -396,20 +490,23 @@ export default class productList extends Component {
                           }
                         ></input>
                       </div>
-           
+
                       <div className="form-group">
                         <label htmlFor="categoria">Categoria</label>
                         <input
                           name="categoria"
                           type="categoria"
                           className="form-control"
-                          value={currentProduct.categoryName}
-                          onChange={this.onChangeCategoryName}
+                          value={
+                            currentProduct
+                              ? currentProduct.categoryName || ""
+                              : ""
+                          }
+                          onChange={this.onChangeCategoryName || ""}
                         ></input>
 
                         <button
                           className="badge badge-success mr-2"
-                          value={currentProduct.categoryName}
                           onClick={this.getCategoryName}
                         >
                           Buscar
@@ -433,6 +530,13 @@ export default class productList extends Component {
                       type="button"
                       className="btn btn-secondary"
                       data-dismiss="modal"
+                      onClick={() => {
+                        this.setState({
+                          currentProduct: null,
+                          categoryExist: undefined,
+                          selectedFiles: null,
+                        });
+                      }}
                     >
                       Cerrar
                     </button>
@@ -443,6 +547,8 @@ export default class productList extends Component {
                       className="btn btn-light"
                       value="Editar"
                       data-dismiss="modal"
+                      disabled={!categoryExist || !selectedFiles}
+                      onClick={this.update}
                     ></input>
                   </div>
                 </div>
@@ -457,29 +563,55 @@ export default class productList extends Component {
                     <th scope="col">Imagen</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Precio</th>
+                    <th scope="col">Cantidad</th>
                     <th scope="col">Descripción</th>
                     <th scope="col">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="datosT">
-                  {this.state.products.map(( product, index) => (
+                  {this.state.products.map((product, index) => (
                     <tr key={product.id}>
                       <td>{product.id}</td>
-                      {this.state.products[index].image ? <td > <img className="img" src={`http://127.0.0.1:8000/api/product/image/${product.image}`} width="200" height="200"></img></td>: 
-                      <td > No image</td>}
+                      {this.state.products[index].image ? (
+                        <td>
+                          <img
+                            className="img"
+                            src={`http://127.0.0.1:8000/api/product/image/${product.image}`}
+                            width="200"
+                            height="250"
+                          ></img>
+                        </td>
+                      ) : (
+                        <td>
+                          <img
+                            className="img"
+                            src="https://elperiodicocr.com/wp-content/uploads/2018/05/no-imagen.jpg"
+                            width="200"
+                            height="250"
+                          ></img>
+                        </td>
+                      )}
                       <td>{product.name}</td>
-                      <td>{product.price}</td>
+                      <td>
+                        {new Intl.NumberFormat("en-EN").format(product.price)}
+                      </td>
+                      <td>
+                        {new Intl.NumberFormat("en-EN").format(product.amount)}
+                      </td>
                       <td>{product.description}</td>
                       <td>
                         <button
                           className="btn btn-outline-warning"
                           data-toggle="modal"
                           data-target="#ModalEditar"
-                          onClick={() => this.replaceModalProduct(index)}
+                          onClick={() =>
+                            this.replaceModalProduct(index, product)
+                          }
                         >
                           editar
                         </button>
                         <button
+                          onClick={() => this.delete(product.id)}
                           className="btn btn-outline-danger"
                         >
                           Eliminar
@@ -494,6 +626,5 @@ export default class productList extends Component {
         )}
       </div>
     );
-    
   }
 }
