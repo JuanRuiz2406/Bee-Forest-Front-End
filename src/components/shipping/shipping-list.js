@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Swal from "sweetalert2";
-import { getShipping, storeShippings, updateShipping } from "../../services/shippingService";
+import { getShipping, storeShippings, updateShipping, deleteShipping } from "../../services/shippingService";
 
 export default class shippingList extends Component {
 
@@ -12,15 +12,15 @@ export default class shippingList extends Component {
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
         this.replaceModalShipping = this.replaceModalShipping.bind(this);
+        this.closeModal = this.closeModal.bind(this);
 
 
         this.state = {
             shippings: null,
             shipping: null,
             isLoading: null,
-
-            requiredItem: 0,
 
             currentShipping: {
                 id: "",
@@ -35,6 +35,17 @@ export default class shippingList extends Component {
     replaceModalShipping(shippings) {
         this.setState({
             currentShipping: shippings
+        });
+    }
+
+    closeModal() {
+        this.setState({
+            currentShipping: {
+                id: "",
+                name: "",
+                price: "",
+                description: ""
+            }
         });
     }
 
@@ -70,7 +81,9 @@ export default class shippingList extends Component {
     }
 
     refreshPage() {
+        this.closeModal();
         window.location.reload();
+
       }
 
     async getShipping() {
@@ -100,10 +113,29 @@ export default class shippingList extends Component {
         }
     }
 
-    update(e) {
-        // update entity - PUT
-        e.preventDefault();
+    async update(id) {
+        
+        const resp = await updateShipping("shipping", this.state.currentShipping, id);
+
+        if(resp.status === "success"){
+            console.log(resp);
+            this.refreshPage();
+        }else{
+            Swal.fire("Error", resp.message, "error");
+        }
       }
+
+    async delete(id) {
+
+        const resp =  await deleteShipping("shipping", id);
+
+        if(resp.status === "success"){
+            console.log(resp);
+            this.refreshPage();
+        }else{
+            Swal.fire("Error", resp.message, "error");
+        }
+    }
 
     render() {
 
@@ -204,6 +236,7 @@ export default class shippingList extends Component {
                                 type="button"
                                 className="btn btn-secondary"
                                 data-dismiss="modal"
+                                onClick={() => this.closeModal()}
                                 >
                                 Cerrar
                                 </button>
@@ -300,6 +333,7 @@ export default class shippingList extends Component {
                                 type="button"
                                 className="btn btn-secondary"
                                 data-dismiss="modal"
+                                onClick={() => this.closeModal()}
                                 >
                                 Cerrar
                                 </button>
@@ -310,6 +344,7 @@ export default class shippingList extends Component {
                                 className="btn btn-light"
                                 value="Editar"
                                 data-dismiss="modal"
+                                onClick={() => this.update(currentShipping.id)}
                                 ></input>
                             </div>
                             </div>
@@ -342,7 +377,10 @@ export default class shippingList extends Component {
                                                 >
                                                 <i className="fas fa-edit">Editar</i>
                                             </button>{"    "}
-                                            <button className="btn btn-outline-danger">
+                                            <button 
+                                            className="btn btn-outline-danger"
+                                            onClick={() => this.delete(shippings.id)}
+                                            >
                                                 <i className="fas fa-trash-alt">Eliminar</i>
                                             </button>
                                             </th>

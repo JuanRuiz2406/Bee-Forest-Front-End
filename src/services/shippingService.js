@@ -33,12 +33,12 @@ export const getShipping = ( endpoint ) => {
     })
 }
 
-export const updateShipping = ( endpoint, shipping, id ) => {
+export const updateShipping = ( endpoint, shipping, id) => {
 
     let json = JSON.stringify(shipping);
     let params = "json=" + json;
 
-    return axios.put(`${ baseUrl }/${ endpoint }/${ id }`, params, { headers: {"Content-Type": "multipart/form-data",'Authorization': token}} )
+    return axios.put(`${ baseUrl }/${ endpoint }/${ id }`, params, { headers: {'Authorization': token}} )
     .then(response => {
 
         return response.data;
@@ -49,12 +49,9 @@ export const updateShipping = ( endpoint, shipping, id ) => {
     })
 }
 
-export const deleteShipping = ( endpoint, shipping) => {
+export const deleteShipping = ( endpoint, id) => {
 
-    let json = JSON.stringify(shipping);
-    let params = 'json=' + json;
-
-    return axios.delete(`${ baseUrl }/${ endpoint }`, params, { headers: {'Authorization': token}} )
+    return axios.delete(`${ baseUrl }/${ endpoint }/${ id }`, { headers: {'Authorization': token}} )
     .then(response => {
 
         return response.data;
