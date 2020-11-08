@@ -1,4 +1,11 @@
 import React, { Component } from "react";
+import "./product-list.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "react-bootstrap-table-next/dist/react-bootstrap-table2.css";
+import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
+import BootstrapTable from "react-bootstrap-table-next";
+import paginationFactory from "react-bootstrap-table2-paginator";
+import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
 import Swal from "sweetalert2";
 import {
   getProducts,
@@ -236,6 +243,141 @@ export default class productList extends Component {
   }
   render() {
     const { currentProduct, selectedFiles, categoryExist } = this.state;
+
+    const columns = [
+      {
+        dataField: "id",
+        text: "ID",
+        headerStyle: (colum, colIndex) => {
+          return { width: "60px", textAlign: "center" };
+        },
+        sort: true,
+      },
+      {
+        dataField: "name",
+        text: "Nombre",
+        headerStyle: (colum, colIndex) => {
+          return { width: "150px", textAlign: "center" };
+        },
+        sort: true,
+      },
+      {
+        dataField: "image",
+        text: "Imagen",
+        formatter: (e, column, columnIndex) => {
+          console.log(column);
+          console.log(columnIndex);
+
+          return this.state.products[columnIndex].image ? (
+            <img
+              className="img"
+              src="https://elperiodicocr.com/wp-content/uploads/2018/05/no-imagen.jpg"
+              width="200"
+              height="250"
+            ></img>
+          ) : (
+            <img
+              className="img"
+              src={`http://127.0.0.1:8000/api/product/image/${column.image}`}
+              width="200"
+              height="250"
+            ></img>
+          );
+        },
+        headerStyle: (colum, colIndex) => {
+          return { width: "250px", textAlign: "center" };
+        },
+        sort: true,
+      },
+      {
+        dataField: "price",
+        text: "Precio",
+        formatter: (e, column, columnIndex) => {
+          return <p>{new Intl.NumberFormat("en-EN").format(column.price)}</p>;
+        },
+        headerStyle: (colum, colIndex) => {
+          return { width: "100px", textAlign: "center" };
+        },
+        sort: true,
+      },
+      {
+        dataField: "amount",
+        text: "Cantidad",
+        formatter: (e, column, columnIndex) => {
+          return <p>{new Intl.NumberFormat("en-EN").format(column.amount)}</p>;
+        },
+        headerStyle: (colum, colIndex) => {
+          return { width: "100px", textAlign: "center" };
+        },
+        sort: true,
+      },
+      {
+        dataField: "description",
+        text: "Descripcion",
+        headerStyle: (colum, colIndex) => {
+          return { width: "250px", textAlign: "center" };
+        },
+        sort: true,
+      },
+      {
+        dataField: "accions",
+        text: "Aciones",
+        formatter: (e, column, columnIndex) => {
+          return (
+            <div>
+              <button
+                className="btn btn-outline-warning"
+                data-toggle="modal"
+                data-target="#ModalEditar"
+                onClick={() => this.replaceModalProduct(columnIndex, column)}
+              >
+                editar
+              </button>
+              <button
+                onClick={() => this.delete(column.id)}
+                className="btn btn-outline-danger"
+              >
+                Eliminar
+              </button>
+            </div>
+          );
+        },
+        headerStyle: (colum, colIndex) => {
+          return { width: "150px", textAlign: "center" };
+        },
+      },
+    ];
+    const defaultSorted = [
+      {
+        dataField: "name",
+        order: "desc",
+      },
+    ];
+
+    const pagination = paginationFactory({
+      page: 1,
+      sizePerPage: 5,
+      lastPageText: ">>",
+      firstPageText: "<<",
+      nextPageText: ">",
+      prePageText: "<",
+      showTotal: true,
+      alwaysShowAllBtns: true,
+    });
+    const { SearchBar, ClearSearchButton } = Search;
+
+    const MyExportCSV = (props) => {
+      const handleClick = () => {
+        props.onExport();
+      };
+      return (
+        <div>
+          <button className="btn btn-success" onClick={handleClick}>
+            Exportar a CSV
+          </button>
+        </div>
+      );
+    };
 
     return (
       <div>
@@ -554,74 +696,35 @@ export default class productList extends Component {
                 </div>
               </div>
             </div>
+              <ToolkitProvider
+                bootstrap4
+                keyField="id"
+                data={this.state.products}
+                columns={columns}
+                search
+                exportCSV
+                search={ {
+                  placeholder: 'Escribe algo'
+                } }
 
-            <div id="divTabla" className="table-responsive">
-              <table id="tabla" className="table table-hover">
-                <thead>
-                  <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Imagen</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Precio</th>
-                    <th scope="col">Cantidad</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="datosT">
-                  {this.state.products.map((product, index) => (
-                    <tr key={product.id}>
-                      <td>{product.id}</td>
-                      {this.state.products[index].image ? (
-                        <td>
-                          <img
-                            className="img"
-                            src={`http://127.0.0.1:8000/api/product/image/${product.image}`}
-                            width="200"
-                            height="250"
-                          ></img>
-                        </td>
-                      ) : (
-                        <td>
-                          <img
-                            className="img"
-                            src="https://elperiodicocr.com/wp-content/uploads/2018/05/no-imagen.jpg"
-                            width="200"
-                            height="250"
-                          ></img>
-                        </td>
-                      )}
-                      <td>{product.name}</td>
-                      <td>
-                        {new Intl.NumberFormat("en-EN").format(product.price)}
-                      </td>
-                      <td>
-                        {new Intl.NumberFormat("en-EN").format(product.amount)}
-                      </td>
-                      <td>{product.description}</td>
-                      <td>
-                        <button
-                          className="btn btn-outline-warning"
-                          data-toggle="modal"
-                          data-target="#ModalEditar"
-                          onClick={() =>
-                            this.replaceModalProduct(index, product)
-                          }
-                        >
-                          editar
-                        </button>
-                        <button
-                          onClick={() => this.delete(product.id)}
-                          className="btn btn-outline-danger"
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+              >
+                {(props) => (
+                  <div>
+                    <h6>Busca por cualquier parametro</h6>
+                    <SearchBar {...props.searchProps} />
+                    <ClearSearchButton {...props.searchProps} />
+                    <hr />
+                    <MyExportCSV {...props.csvProps} />
+                    <BootstrapTable
+                      defaultSorted={defaultSorted}
+                      pagination={pagination}
+                      {...props.baseProps}
+                      wrapperClasses="table-responsive"
+                    />
+                  </div>
+                )}
+              </ToolkitProvider>
+         
           </div>
         )}
       </div>
