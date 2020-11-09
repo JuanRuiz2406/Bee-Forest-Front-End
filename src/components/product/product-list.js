@@ -13,8 +13,10 @@ import {
   uploadProduct,
   updateProducts,
   deleteProducts,
+  getMaterialByProduct,
 } from "../../services/productService";
 import { getCategory } from "../../services/categoryService";
+import { getMaterial } from "../../services/materialService";
 
 export default class productList extends Component {
   constructor(props) {
@@ -22,32 +24,44 @@ export default class productList extends Component {
 
     this.onChangeCategoryName = this.onChangeCategoryName.bind(this);
     this.getCategoryName = this.getCategoryName.bind(this);
+    this.getMaterialValues = this.getMaterialValues.bind(this);
     this.onChangeName = this.onChangeName.bind(this);
     this.onChangePrice = this.onChangePrice.bind(this);
     this.onChangeAmount = this.onChangeAmount.bind(this);
+    this.onChangeMaterialName = this.onChangeMaterialName.bind(this);
+    this.onChangeMaterialAmount = this.onChangeMaterialAmount.bind(this);
     this.selectFile = this.selectFile.bind(this);
+    this.addMaterial = this.addMaterial.bind(this);
     this.create = this.create.bind(this);
     this.update = this.update.bind(this);
     this.delete = this.delete.bind(this);
     this.uploadImage = this.uploadImage.bind(this);
     this.replaceModalProduct = this.replaceModalProduct.bind(this);
+    this.deleteMaterial = this.deleteMaterial.bind(this);
 
     this.state = {
       products: null,
+      product_material: [],
       isLoading: null,
-
+      materials: [],
       selectedFiles: undefined,
       categoryExist: undefined,
+      materialExist: undefined,
       requiredItem: 0,
 
       currentProduct: {
-        categoryId: null,
+        categoryId: 0,
         categoryName: "",
         name: "",
         price: "",
-        amount: "",
+        amount: 0,
         description: "",
         image: "",
+        materialId: null,
+        materialName: "",
+        materialAmount: 0,
+        materialPrice: 0,
+        totalMaterial: 0,
       },
       message: "",
     };
@@ -56,6 +70,25 @@ export default class productList extends Component {
   componentDidMount() {
     this.getProducts();
   }
+
+  deleteMaterial = (e, dato) => {
+    e.preventDefault();
+    var opcion = window.confirm(
+      "Estás Seguro que deseas Eliminar el material " + dato.id
+    );
+    if (opcion == true) {
+      var contador = 0;
+      var arreglo = this.state.materials;
+      arreglo.map((registro) => {
+        if (dato.id == registro.id) {
+          arreglo.splice(contador, 1);
+        }
+        contador++;
+      });
+
+      this.setState({ materials: arreglo });
+    }
+  };
 
   replaceModalProduct(index, product) {
     this.setState({
@@ -74,6 +107,94 @@ export default class productList extends Component {
         categoryName: categoryName,
       },
     }));
+  }
+
+  onChangeMaterialAmount(e) {
+    e.preventDefault();
+    const materialAmount = e.target.value;
+
+    this.setState((prevState) => ({
+      currentProduct: {
+        ...prevState.currentProduct,
+        materialAmount: materialAmount,
+      },
+    }));
+  }
+
+  onChangeMaterialName(e) {
+    e.preventDefault();
+    const materialName = e.target.value;
+
+    this.setState((prevState) => ({
+      currentProduct: {
+        ...prevState.currentProduct,
+        materialName: materialName,
+      },
+    }));
+  }
+
+  async getMaterialValues(e) {
+    e.preventDefault();
+    if (this.state.currentProduct.materialName === "") {
+      this.state.currentProduct.materialName = "no exist";
+    }
+    const resp = await getMaterial(
+      "material",
+      this.state.currentProduct.materialName
+    );
+
+    if (resp.status === "success") {
+      this.state.materialExist = true;
+      this.setState((prevState) => ({
+        currentProduct: {
+          ...prevState.currentProduct,
+          materialName: resp.data[0].name,
+          materialId: resp.data[0].id,
+          materialPrice: resp.data[0].price,
+          totalMaterial: resp.data[0].amount,
+        },
+      }));
+
+      Swal.fire({
+        icon: "success",
+        title: `Material ${resp.data[0].name}, cantidad ${
+          resp.data[0].amount
+        }, precio ${new Intl.NumberFormat("en-EN").format(resp.data[0].price)}`,
+      });
+    } else {
+      Swal.fire("Oops", "No se encontro el material", "error");
+      this.setState((prevState) => ({
+        currentProduct: {
+          ...prevState.currentProduct,
+          materialName: null,
+          materialId: 0,
+          materialAmount: 0,
+          materialPrice: 0,
+          totalMaterial: 0,
+        },
+      }));
+    }
+  }
+
+  addMaterial(e) {
+    e.preventDefault();
+
+    let validate =
+      parseInt(this.state.currentProduct.totalMaterial) -
+      parseInt(this.state.currentProduct.amount) *
+        parseInt(this.state.currentProduct.materialAmount);
+
+    if (this.state.currentProduct && validate >= 0) {
+      var valorNuevo = { ...this.state.currentProduct };
+      valorNuevo.id = this.state.materials.length + 1;
+      var lista = this.state.materials;
+      lista.push(valorNuevo);
+      this.setState({ materials: lista });
+
+      console.log(this.state.materials);
+    } else {
+      Swal.fire("Oops", `Cantidad de materiales insuficiente:`, "error");
+    }
   }
 
   onChangeDescription(e) {
@@ -123,7 +244,6 @@ export default class productList extends Component {
     );
 
     if (resp.status === "success") {
-      console.log(resp.data[0].id);
       this.state.categoryExist = true;
       this.setState((prevState) => ({
         currentProduct: {
@@ -156,6 +276,22 @@ export default class productList extends Component {
     }
   }
 
+  async getMaterialByProduct(e, product) {
+    e.preventDefault();
+
+    const resp = await getMaterialByProduct(
+      `product/get-material/${product.id}`
+    );
+    if (resp.status === "success") {
+      this.setState({ product_material: resp.data });
+    } else {
+      Swal.fire("Error", resp.message, "error");
+    }
+
+    console.log(product.id);
+    console.log(this.state.product_material);
+  }
+
   refreshPage() {
     window.location.reload();
   }
@@ -173,21 +309,52 @@ export default class productList extends Component {
   }
 
   async update(e) {
-    // update entity - PUT
     e.preventDefault();
-
     console.log(this.state.currentProduct);
+    let d = false;
 
-    const resp = await updateProducts(
-      `product/${this.state.currentProduct.id}`,
-      this.state.currentProduct
-    );
+    if (this.state.materials.length > 0) {
+      let json = {
+        categoryId: this.state.currentProduct.categoryId,
+        name: this.state.currentProduct.name,
+        price: this.state.currentProduct.price,
+        amount: this.state.currentProduct.amount,
+        description: this.state.currentProduct.description,
+        image: this.state.currentProduct.image,
+        materials: this.state.materials,
+      };
 
-    if (resp.status === "success") {
-      console.log(resp);
-      this.refreshPage();
+      let d = false;
+      await Swal.fire({
+        title: "Esta seguro?",
+        text: "Esta seguro de actualizar el producto",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, actualizar!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          d = true;
+        }
+      });
+
+      if (d) {
+        const resp = await updateProducts(
+          `product/${this.state.currentProduct.id}`,
+          json
+        );
+
+        if (resp.status === "success") {
+          console.log(resp);
+        } else {
+          Swal.fire("Error", resp.message, "error");
+        }
+
+        this.refreshPage();
+      }
     } else {
-      Swal.fire("Error", resp.message, "error");
+      Swal.fire("Error", "Agrega algun material", "error");
     }
   }
 
@@ -268,17 +435,12 @@ export default class productList extends Component {
           console.log(column);
           console.log(columnIndex);
 
-          return this.state.products[columnIndex].image ? (
+          return (
             <img
               className="img"
-              src="https://elperiodicocr.com/wp-content/uploads/2018/05/no-imagen.jpg"
-              width="200"
-              height="250"
-            ></img>
-          ) : (
-            <img
-              className="img"
-              src={`http://127.0.0.1:8000/api/product/image/${column.image}`}
+              src={`http://127.0.0.1:8000/api/product/image/${
+                column.image ? column.image || null : "1604875316no-imagen.jpg"
+              }`}
               width="200"
               height="250"
             ></img>
@@ -307,7 +469,7 @@ export default class productList extends Component {
           return <p>{new Intl.NumberFormat("en-EN").format(column.amount)}</p>;
         },
         headerStyle: (colum, colIndex) => {
-          return { width: "100px", textAlign: "center" };
+          return { width: "113px", textAlign: "center" };
         },
         sort: true,
       },
@@ -331,13 +493,23 @@ export default class productList extends Component {
                 data-target="#ModalEditar"
                 onClick={() => this.replaceModalProduct(columnIndex, column)}
               >
-                editar
+                Editar
               </button>
               <button
                 onClick={() => this.delete(column.id)}
                 className="btn btn-outline-danger"
               >
                 Eliminar
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outline-primary"
+                data-toggle="modal"
+                data-target="#exampleModalScrollableShow"
+                onClick={(e) => this.getMaterialByProduct(e, column)}
+              >
+                Materiales
               </button>
             </div>
           );
@@ -375,6 +547,8 @@ export default class productList extends Component {
           <button className="btn btn-success" onClick={handleClick}>
             Exportar a CSV
           </button>
+          <br />
+          <br />
         </div>
       );
     };
@@ -538,6 +712,83 @@ export default class productList extends Component {
 
             <div
               className="modal fade"
+              id="exampleModalScrollableShow"
+              role="dialog"
+              aria-labelledby="exampleModalScrollableShow"
+              aria-hidden="true"
+            >
+              <div
+                className="modal-dialog modal-dialog-scrollable"
+                role="document"
+              >
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h6
+                      className="modal-title"
+                      id="exampleModalScrollableTitle"
+                    >
+                      Materiales de producto
+                    </h6>
+                    <button
+                      type="button"
+                      className="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <div id="divTable" className="table-responsive">
+                      <table id="tabla" className="table table-hover">
+                        <thead>
+                          <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">cantidad</th>
+                            <th scope="col">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody id="datosT">
+                          {this.state.product_material.map(
+                            (material, index) => (
+                              <tr id={material.id} key={index}>
+                                <th>{material.id}</th>
+                                <th>{material.name}</th>
+                                <th>{material.price}</th>
+                                <th>{material.amount}</th>
+                                <th>
+                                  <button
+                                    className="btn btn-outline-danger"
+                                    data-toggle="modal"
+                                    data-target="#"
+                                  >
+                                    X
+                                  </button>
+                                </th>
+                              </tr>
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      data-dismiss="modal"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="modal fade"
               id="ModalEditar"
               role="dialog"
               aria-labelledby="exampleModalScrollableTitle"
@@ -598,22 +849,6 @@ export default class productList extends Component {
                       </div>
 
                       <div className="form-group">
-                        <label htmlFor="amount">Cantidad</label>
-                        <input
-                          name="amount"
-                          type="number"
-                          className="form-control"
-                          id="amount"
-                          value={
-                            currentProduct ? currentProduct.amount || "" : ""
-                          }
-                          onChange={(e) =>
-                            this.onChangeAmount({ amount: e.target.value })
-                          }
-                        ></input>
-                      </div>
-
-                      <div className="form-group">
                         <label htmlFor="description">Descripcion</label>
                         <input
                           name="description"
@@ -651,9 +886,80 @@ export default class productList extends Component {
                           className="badge badge-success mr-2"
                           onClick={this.getCategoryName}
                         >
-                          Buscar
+                          Buscar categoria
                         </button>
                       </div>
+
+                      <hr></hr>
+
+                      <div className="form-group">
+                        <label htmlFor="amount">Cantidad</label>
+                        <input
+                          name="amount"
+                          type="number"
+                          className="form-control"
+                          id="amount"
+                          value={
+                            currentProduct ? currentProduct.amount || 0 : 0
+                          }
+                          onChange={(e) =>
+                            this.onChangeAmount({ amount: e.target.value })
+                          }
+                        ></input>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="materialName">Nombre de material</label>
+                        <input
+                          name="materialName"
+                          type="materialName"
+                          className="form-control"
+                          value={
+                            currentProduct
+                              ? currentProduct.materialName || ""
+                              : ""
+                          }
+                          onChange={this.onChangeMaterialName || ""}
+                        ></input>
+
+                        <button
+                          className="badge badge-success mr-2"
+                          onClick={this.getMaterialValues}
+                        >
+                          Buscar material
+                        </button>
+                      </div>
+
+                      <div className="form-group">
+                        <label htmlFor="amountMaterial">
+                          Cantidad de material{" "}
+                          {currentProduct ? currentProduct.materialName : ""}
+                        </label>
+                        <input
+                          name="amountMaterial"
+                          type="number"
+                          className="form-control"
+                          id="amountMaterial"
+                          value={
+                            currentProduct
+                              ? currentProduct.materialAmount || 0
+                              : 0
+                          }
+                          onChange={this.onChangeMaterialAmount || null}
+                        ></input>
+
+                        <button
+                          className="badge badge-success mr-2"
+                          onClick={this.addMaterial}
+                        >
+                          Agregar material
+                        </button>
+                      </div>
+
+                      <hr></hr>
+
+                      <label htmlFor="amount">Imagen</label>
+                      <br />
                       <label className="btn btn-default">
                         <input type="file" onChange={this.selectFile} />
                       </label>
@@ -689,42 +995,36 @@ export default class productList extends Component {
                       className="btn btn-light"
                       value="Editar"
                       data-dismiss="modal"
-                      disabled={!categoryExist || !selectedFiles}
                       onClick={this.update}
                     ></input>
                   </div>
                 </div>
               </div>
             </div>
-              <ToolkitProvider
-                bootstrap4
-                keyField="id"
-                data={this.state.products}
-                columns={columns}
-                search
-                exportCSV
-                search={ {
-                  placeholder: 'Escribe algo'
-                } }
-
-              >
-                {(props) => (
-                  <div>
-                    <h6>Busca por cualquier parametro</h6>
-                    <SearchBar {...props.searchProps} />
-                    <ClearSearchButton {...props.searchProps} />
-                    <hr />
-                    <MyExportCSV {...props.csvProps} />
-                    <BootstrapTable
-                      defaultSorted={defaultSorted}
-                      pagination={pagination}
-                      {...props.baseProps}
-                      wrapperClasses="table-responsive"
-                    />
-                  </div>
-                )}
-              </ToolkitProvider>
-         
+            <ToolkitProvider
+              bootstrap4
+              keyField="id"
+              data={this.state.products}
+              columns={columns}
+              search
+              exportCSV
+            >
+              {(props) => (
+                <div>
+                  <h6>Busca por cualquier parametro</h6>
+                  <SearchBar {...props.searchProps} />
+                  <ClearSearchButton {...props.searchProps} />
+                  <hr />
+                  <MyExportCSV {...props.csvProps} />
+                  <BootstrapTable
+                    defaultSorted={defaultSorted}
+                    pagination={pagination}
+                    {...props.baseProps}
+                    wrapperClasses="table-responsive"
+                  />
+                </div>
+              )}
+            </ToolkitProvider>
           </div>
         )}
       </div>

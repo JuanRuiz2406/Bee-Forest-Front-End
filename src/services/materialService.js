@@ -20,3 +20,17 @@ export const getMaterials = ( endpoint ) => { // por el momento solo un parametr
         return error;
     });            
 }
+
+export const getMaterial = ( endpoint, materialName ) => { // por el momento solo un parametro luego tendremos que mandar el token
+    
+    return axios.get( `${ baseUrl }/${ endpoint }/${ materialName }`, { headers: {'Content-Type': 'application/json', 'Authorization': token}} )
+    .then(response => {
+    return response.data;
+
+    })
+
+    .catch(error => {
+        console.log(error);
+        return error;
+    });            
+}

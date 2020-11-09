@@ -92,3 +92,18 @@ export const getProducts = ( endpoint ) => { // por el momento solo un parametro
         return error;
     });            
 }
+
+export const getMaterialByProduct = ( endpoint ) => { // por el momento solo un parametro luego tendremos que mandar el token
+ 
+    return axios.get( `${ baseUrl }/${ endpoint }`, { headers: {'Content-Type': 'application/json', 'Authorization': token}} )
+    .then(response => {
+        
+    return response.data;
+
+    })
+
+    .catch(error => {
+        console.log(error);
+        return error;
+    });            
+}
