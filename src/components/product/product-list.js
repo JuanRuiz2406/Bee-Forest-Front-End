@@ -956,6 +956,45 @@ export default class productList extends Component {
                         </button>
                       </div>
 
+
+                      <div id="divTable" className="table-responsive">
+                      <table id="tabla" className="table table-hover">
+                        <thead>
+                          <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Accion</th>
+                          </tr>
+                        </thead>
+                        <tbody id="datosT">
+                          {this.state.materials.map((material, index) => (
+                            <tr id={material.materialId} key={index}>
+                              <th>{material.materialId}</th>
+                              <th>{material.materialName}</th>
+                              <th>{material.materialAmount}</th>
+                              <th>
+                                {new Intl.NumberFormat("en-EN").format(
+                                  material.materialPrice
+                                )}
+                              </th>
+                              <th>
+                                <button
+                                  className="btn btn-outline-danger"
+                                  onClick={(e) =>
+                                    this.deleteMaterial(e, material)
+                                  }
+                                >
+                                  <i className="fas fa-trash-alt">X</i>
+                                </button>
+                              </th>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
                       <hr></hr>
 
                       <label htmlFor="amount">Imagen</label>
