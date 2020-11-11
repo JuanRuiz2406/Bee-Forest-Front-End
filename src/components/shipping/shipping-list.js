@@ -1,9 +1,15 @@
 import React, { Component } from "react";
+import "./shipping-list.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "react-bootstrap-table-next/dist/react-bootstrap-table2.css";
+import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
+import BootstrapTable from "react-bootstrap-table-next";
+import paginationFactory from "react-bootstrap-table2-paginator";
+import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
 import Swal from "sweetalert2";
-import { getShipping, storeShippings, updateShipping, deleteShipping } from "../../services/shippingService";
+import { getShippings, storeShippings, updateShipping, deleteShipping } from "../../services/shippingService";
 
 export default class shippingList extends Component {
-
     constructor(props) {
         super(props);
 
@@ -13,44 +19,31 @@ export default class shippingList extends Component {
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.replaceModalShipping = this.replaceModalShipping.bind(this);
-        this.closeModal = this.closeModal.bind(this);
-
 
         this.state = {
-            shippings: null,
             shipping: null,
             isLoading: null,
+            requiredItem: 0,
 
             currentShipping: {
-                id: "",
+                id: 0,
                 name: "",
                 price: "",
-                description: ""
+                description: "",
             },
             message: "",
         };
     }
 
-    replaceModalShipping(shippings) {
-        this.setState({
-            currentShipping: shippings
-        });
+    componentDidMount() {
+        this.getShippings();
     }
 
-    closeModal() {
+    replaceModalShipping(index, shipping) {
         this.setState({
-            currentShipping: {
-                id: "",
-                name: "",
-                price: "",
-                description: ""
-            }
+            requiredItem: index,
+            currentProvider: shipping,
         });
-    }
-
-    componentDidMount(){
-        this.getShipping();
     }
 
     onChangeName(e) {
@@ -66,7 +59,7 @@ export default class shippingList extends Component {
         this.setState((prevState) => ({
             currentShipping: {
                 ...prevState.currentShipping,
-                price: e.price,
+                surname: e.price,
             },
         }));
     }
@@ -75,321 +68,457 @@ export default class shippingList extends Component {
         this.setState((prevState) => ({
             currentShipping: {
                 ...prevState.currentShipping,
-                description: e.description,
+                telephone: e.description,
             },
         }));
     }
 
-    refreshPage() {
-        this.closeModal();
-        window.location.reload();
 
-      }
-
-    async getShipping() {
-        if (!this.state.shippings) {
+    async getShippings() {
+        if (!this.state.shipping) {
             this.setState({ isLoading: true });
 
-            const resp = await getShipping("shipping");
-
+            const resp = await getShippings("shipping");
             if (resp.status === "success") {
-                console.log(resp);
-                this.setState({ shippings: resp.data, isLoading: false });
-            }else {
+                this.setState({ shipping: resp.data, isLoading: false });
+            } else {
                 Swal.fire("Error", resp.message, "error");
             }
         }
     }
 
+    refreshPage() {
+        window.location.reload();
+    }
+
     async create() {
+        const resp = await storeShippings("shipping", this.state.currentShipping);
 
-        const resp =  await storeShippings("shipping", this.state.currentShipping);
+        console.log(this.state.currentShipping);
 
-        if(resp.status === "success"){
-                console.log(resp);
-                this.refreshPage();
-        }else{
+        if (resp.status === "success") {
+            console.log(resp);
+            this.refreshPage();
+        } else {
             Swal.fire("Error", resp.message, "error");
         }
     }
 
-    async update(id) {
-        
-        const resp = await updateShipping("shipping", this.state.currentShipping, id);
+    async update(e) {
+        e.preventDefault();
+        console.log(this.state.currentShipping);
+        let d = false;
 
-        if(resp.status === "success"){
-            console.log(resp);
+        let json = {
+            name: this.state.currentShipping.name,
+            price: this.state.currentShipping.price,
+            description: this.state.currentShipping.description,
+        };
+
+        await Swal.fire({
+            title: "Esta seguro?",
+            text: "Esta seguro de actualizar el tipo de envio",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si, actualizar!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                d = true;
+            }
+        });
+
+        if (d) {
+            const resp = await updateShipping(
+                `shipping/${this.state.currentShipping.id}`,
+                json
+            );
+
+            if (resp.status === "success") {
+                console.log(resp);
+            } else {
+                Swal.fire("Error", resp.message, "error");
+            }
+
             this.refreshPage();
-        }else{
-            Swal.fire("Error", resp.message, "error");
         }
-      }
 
-    async delete(id) {
+    }
 
-        const resp =  await deleteShipping("shipping", id);
+    async delete(shippingId) {
+        let d = false;
+        await Swal.fire({
+            title: "Esta seguro?",
+            text: "Se eliminaran todos los datos relacionados con este tipo de envio",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Si, eliminar!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                d = true;
+            }
+        });
 
-        if(resp.status === "success"){
-            console.log(resp);
+        if (d) {
+            await deleteShipping(`shipping/${shippingId}`);
             this.refreshPage();
-        }else{
-            Swal.fire("Error", resp.message, "error");
         }
     }
 
     render() {
-
         const { currentShipping } = this.state;
+
+        const columns = [
+            {
+                dataField: "name",
+                text: "Nombre",
+                headerStyle: (colum, colIndex) => {
+                    return { width: "150px", textAlign: "center" };
+                },
+                sort: true,
+            },
+            {
+                dataField: "price",
+                text: "Precio",
+                headerStyle: (colum, colIndex) => {
+                    return { width: "150px", textAlign: "center" };
+                },
+                sort: true,
+            },
+            {
+                dataField: "description",
+                text: "Descripcion",
+                headerStyle: (colum, colIndex) => {
+                    return { width: "113px", textAlign: "center" };
+                },
+                sort: true,
+            },
+            {
+                dataField: "accions",
+                text: "Aciones",
+                formatter: (e, column, columnIndex) => {
+                    return (
+                        <div>
+                            <button
+                                className="btn btn-outline-warning"
+                                data-toggle="modal"
+                                data-target="#ModalEditar"
+                                onClick={() => this.replaceModalShipping(columnIndex, column)}
+                            >
+                                Editar
+              </button>
+                            <button
+                                onClick={() => this.delete(column.id)}
+                                className="btn btn-outline-danger"
+                            >
+                                Eliminar
+              </button>
+
+                        </div>
+                    );
+                },
+                headerStyle: (colum, colIndex) => {
+                    return { width: "150px", textAlign: "center" };
+                },
+            },
+        ];
+        const defaultSorted = [
+            {
+                dataField: "name",
+                order: "desc",
+            },
+        ];
+
+        const pagination = paginationFactory({
+            page: 1,
+            sizePerPage: 5,
+            lastPageText: ">>",
+            firstPageText: "<<",
+            nextPageText: ">",
+            prePageText: "<",
+            showTotal: true,
+            alwaysShowAllBtns: true,
+        });
+        const { SearchBar, ClearSearchButton } = Search;
+
+        const MyExportCSV = (props) => {
+            const handleClick = () => {
+                props.onExport();
+            };
+            return (
+                <div>
+                    <button className="btn btn-success" onClick={handleClick}>
+                        Exportar a CSV
+          </button>
+                    <br />
+                    <br />
+                </div>
+            );
+        };
 
         return (
             <div>
-                {this.state.isLoading && <span>Cargando Tipos de envios</span>}
+                {this.state.isLoading && <span>Cargando Tipos de Envio</span>}
 
-                {this.state.shippings && (
+                {this.state.providers && (
                     <div>
-                        <h3 className="text-center">Tipos de Envío</h3>
+                        <h3 className="text-center">Tipos de Envios</h3>
 
                         <button
-                        type="button"
-                        className="btn btn-dark text-white"
-                        data-toggle="modal"
-                        data-target="#exampleModalScrollable"
+                            type="button"
+                            className="btn btn-dark text-white"
+                            data-toggle="modal"
+                            data-target="#exampleModalScrollable"
+                            onClick={() => {
+                                this.setState({ currentShipping: null });
+                            }}
                         >
-                        Agregar
-                        </button>
+                            Agregar
+            </button>
                         <br></br>
                         <br></br>
+                        <div
+                            className="modal fade"
+                            id="exampleModalScrollable"
+                            role="dialog"
+                            aria-labelledby="exampleModalScrollableTitle"
+                            aria-hidden="true"
+                        >
+                            <div
+                                className="modal-dialog modal-dialog-scrollable"
+                                role="document"
+                            >
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h6
+                                            className="modal-title"
+                                            id="exampleModalScrollableTitle"
+                                        >
+                                            Agregar Tipo de Envio
+                    </h6>
+                                        <button
+                                            type="button"
+                                            className="close"
+                                            data-dismiss="modal"
+                                            aria-label="Close"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div className="modal-body">
+                                        <form>
+                                            <div className="form-group">
+                                                <label htmlFor="nombre">Nombre</label>
+                                                <input
+                                                    name="nombre"
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="nombre"
+                                                    value={
+                                                        currentShipping ? currentShipping.name || "" : ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        this.onChangeName({ name: e.target.value })
+                                                    }
+                                                ></input>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label htmlFor="surname">Precio</label>
+                                                <input
+                                                    name="Precio"
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="precio"
+                                                    value={
+                                                        currentShipping ? currentShipping.price || "" : ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        this.onChangePrice({ price: e.target.value })
+                                                    }
+                                                ></input>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label htmlFor="telephone">Descripcion</label>
+                                                <input
+                                                    name="Descripcion"
+                                                    type="number"
+                                                    className="form-control"
+                                                    id="descripcion"
+                                                    value={
+                                                        currentShipping ? currentShipping.description || "" : ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        this.onChangeDescription({ description: e.target.value })
+                                                    }
+                                                ></input>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            data-dismiss="modal"
+                                            onClick={() => {
+                                                this.setState({
+                                                    currentShipping: null,
+                                                });
+                                            }}
+                                        >
+                                            Cerrar
+                    </button>
+                                        <input
+                                            name="agregar"
+                                            id="realizado2"
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            value="Agregar"
+                                            data-dismiss="modal"
+                                            onClick={this.create}
+                                        ></input>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div
-                        className="modal fade"
-                        id="exampleModalScrollable"
-                        tabIndex="-1"
-                        role="dialog"
-                        aria-labelledby="exampleModalScrollableTitle"
-                        aria-hidden="true"
+                            className="modal fade"
+                            id="ModalEditar"
+                            role="dialog"
+                            aria-labelledby="exampleModalScrollableTitle"
+                            aria-hidden="true"
                         >
-                        <div className="modal-dialog modal-dialog-scrollable" role="document">
-                            <div className="modal-content">
-                            <div className="modal-header">
-                                <h6 className="modal-title" id="exampleModalScrollableTitle">
-                                Agregar Tipo de envio
-                                </h6>
-                                <button
-                                type="button"
-                                className="close"
-                                data-dismiss="modal"
-                                aria-label="Close"
-                                >
-                                <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div className="modal-body">
-                                <form>
-                                
-                                <div className="form-group">
-                                    <label htmlFor="nombre">Nombre</label>
-                                    <input
-                                    name="nombreEdit"
-                                    type="text"
-                                    className="form-control"
-                                    id="nombre"
-                                    value={currentShipping.name}
-                                    onChange={(e) => 
-                                        this.onChangeName({ name: e.target.value })
-                                    }
-                                    ></input>
+                            <div
+                                className="modal-dialog modal-dialog-scrollable"
+                                role="document"
+                            >
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h6
+                                            className="modal-title"
+                                            id="exampleModalScrollableTitle"
+                                        >
+                                            Editar Tipo de Envio
+                    </h6>
+                                        <button
+                                            type="button"
+                                            className="close"
+                                            data-dismiss="modal"
+                                            aria-label="Close"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div className="modal-body">
+                                        <form>
+                                            <div className="form-group">
+                                                <label htmlFor="nombre">Nombre</label>
+                                                <input
+                                                    name="nombre"
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="nombre"
+                                                    value={
+                                                        currentShipping ? currentShipping.name || "" : ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        this.onChangeName({ name: e.target.value })
+                                                    }
+                                                ></input>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label htmlFor="surname">Precio</label>
+                                                <input
+                                                    name="Precio"
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="precio"
+                                                    value={
+                                                        currentShipping ? currentShipping.surname || "" : ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        this.onChangePrice({ price: e.target.value })
+                                                    }
+                                                ></input>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label htmlFor="telephone">Descripcion</label>
+                                                <input
+                                                    name="Descrpcion"
+                                                    type="number"
+                                                    className="form-control"
+                                                    id="Descripcion"
+                                                    value={
+                                                        currentShipping ? currentShipping.description || "" : ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        this.onChangeDescription({ description: e.target.value })
+                                                    }
+                                                ></input>
+                                            </div>
+
+
+                                        </form>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary"
+                                            data-dismiss="modal"
+                                            onClick={() => {
+                                                this.setState({
+                                                    currentShipping: null,
+                                                });
+                                            }}
+                                        >
+                                            Cerrar
+                    </button>
+                                        <input
+                                            name="agregar"
+                                            id="realizado2"
+                                            type="submit"
+                                            className="btn btn-light"
+                                            value="Editar"
+                                            data-dismiss="modal"
+                                            onClick={this.update}
+                                        ></input>
+                                    </div>
                                 </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="price">Precio</label>
-                                    <input
-                                    name="priceEdit"
-                                    type="number"
-                                    className="form-control"
-                                    id="price"
-                                    value={currentShipping.price}
-                                    onChange={(e) => 
-                                        this.onChangePrice({ price: e.target.value })
-                                    }
-                                    ></input>
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="descripcion">Descripcion</label>
-                                    <input
-                                    name="descriptionEdit"
-                                    type="text"
-                                    className="form-control"
-                                    id="descripcion"
-                                    value={currentShipping.description}
-                                    onChange={(e) => 
-                                        this.onChangeDescription({ description: e.target.value })
-                                    }
-                                    ></input>
-                                </div>
-
-
-                                </form>
-                            </div>
-                            <div className="modal-footer">
-                                <button
-                                type="button"
-                                className="btn btn-secondary"
-                                data-dismiss="modal"
-                                onClick={() => this.closeModal()}
-                                >
-                                Cerrar
-                                </button>
-                                <input
-                                name="agregar"
-                                id="realizado2"
-                                type="submit"
-                                className="btn btn-light"
-                                value="Agregar"
-                                data-dismiss="modal"
-                                onClick={this.create}
-                                ></input>
-                            </div>
                             </div>
                         </div>
-                        </div>
-
-
-
-
-                        <div
-                        className="modal fade"
-                        id="ModalEditar"
-                        tabIndex="-1"
-                        role="dialog"
-                        aria-labelledby="exampleModalScrollableTitle"
-                        aria-hidden="true"
+                        <ToolkitProvider
+                            bootstrap4
+                            keyField="id"
+                            data={this.state.shipping}
+                            columns={columns}
+                            search
+                            exportCSV
                         >
-                        <div className="modal-dialog modal-dialog-scrollable" role="document">
-                            <div className="modal-content">
-                            <div className="modal-header">
-                                <h6 className="modal-title" id="exampleModalScrollableTitle">
-                                Editar Tipo de envio
-                                </h6>
-                                <button
-                                type="button"
-                                className="close"
-                                data-dismiss="modal"
-                                aria-label="Close"
-                                >
-                                <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div className="modal-body">
-                                <form>
-                                
-                                <div className="form-group">
-                                    <label htmlFor="nombre">Nombre</label>
-                                    <input
-                                    name="nombre"
-                                    type="text"
-                                    className="form-control"
-                                    id="nombreu"
-                                    value={ this.state.currentShipping.name }
-                                    onChange={(e) => 
-                                        this.onChangeName({ name: e.target.value })
-                                    }
-                                    ></input>
+                            {(props) => (
+                                <div>
+                                    <h6>Busca por cualquier parametro</h6>
+                                    <SearchBar {...props.searchProps} />
+                                    <ClearSearchButton {...props.searchProps} />
+                                    <hr />
+                                    <MyExportCSV {...props.csvProps} />
+                                    <BootstrapTable
+                                        defaultSorted={defaultSorted}
+                                        pagination={pagination}
+                                        {...props.baseProps}
+                                        wrapperClasses="table-responsive"
+                                    />
                                 </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="price">Precio</label>
-                                    <input
-                                    name="price"
-                                    type="number"
-                                    className="form-control"
-                                    id="priceu"
-                                    value={ this.state.currentShipping.price }
-                                    onChange={(e) => 
-                                        this.onChangePrice({ price: e.target.value })
-                                    }
-                                    ></input>
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="descripcion">Descripcion</label>
-                                    <input
-                                    name="descripcion"
-                                    type="text"
-                                    className="form-control"
-                                    id="descripcionu"
-                                    value={this.state.currentShipping.description }
-                                    onChange={(e) => 
-                                        this.onChangeDescription({ description: e.target.value })
-                                    }
-                                    ></input>
-                                </div>
-
-
-                                </form>
-                            </div>
-                            <div className="modal-footer">
-                                <button
-                                type="button"
-                                className="btn btn-secondary"
-                                data-dismiss="modal"
-                                onClick={() => this.closeModal()}
-                                >
-                                Cerrar
-                                </button>
-                                <input
-                                name="Editar"
-                                id="realizado2"
-                                type="submit"
-                                className="btn btn-light"
-                                value="Editar"
-                                data-dismiss="modal"
-                                onClick={() => this.update(currentShipping.id)}
-                                ></input>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-
-
-                        <div id="divTable" className="table-responsive">
-                            <table id="tabla" className="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Nombre</th>
-                                        <th scope="col">Precio</th>
-                                        <th scope="col">Descripcion</th>
-                                        <th scope="col">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="datosT">
-                                    {this.state.shippings.map((shippings) =>(
-                                        <tr id={shippings.id} key={shippings.id}>
-                                            <th>{shippings.name}</th>
-                                            <th>{shippings.price}</th>
-                                            <th>{shippings.description}</th>
-                                            <th>
-                                            <button
-                                                className="btn btn-outline-warning"
-                                                data-toggle="modal"
-                                                data-target="#ModalEditar"
-                                                onClick={() => this.replaceModalShipping(shippings)}
-                                                >
-                                                <i className="fas fa-edit">Editar</i>
-                                            </button>{"    "}
-                                            <button 
-                                            className="btn btn-outline-danger"
-                                            onClick={() => this.delete(shippings.id)}
-                                            >
-                                                <i className="fas fa-trash-alt">Eliminar</i>
-                                            </button>
-                                            </th>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>              
+                            )}
+                        </ToolkitProvider>
+                    </div>
                 )}
             </div>
         );

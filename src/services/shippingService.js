@@ -20,7 +20,7 @@ export const storeShippings = (endpoint, shipping) => {
         });
 }
 
-export const getShipping = (endpoint) => {
+export const getShippings = (endpoint) => {
 
     return axios.get(`${baseUrl}/${endpoint}`, { headers: { 'content-type': 'application/json', 'Authorization': token } })
         .then(response => {
@@ -33,12 +33,12 @@ export const getShipping = (endpoint) => {
         })
 }
 
-export const updateShipping = (endpoint, shipping, id) => {
+export const updateShipping = (endpoint, shipping) => {
 
     let json = JSON.stringify(shipping);
     let params = "json=" + json;
 
-    return axios.put(`${baseUrl}/${endpoint}/${id}`, params, { headers: { 'Authorization': token } })
+    return axios.put(`${baseUrl}/${endpoint}`, params, { headers: { 'Authorization': token } })
         .then(response => {
 
             return response.data;
@@ -49,9 +49,9 @@ export const updateShipping = (endpoint, shipping, id) => {
         })
 }
 
-export const deleteShipping = (endpoint, id) => {
+export const deleteShipping = (endpoint) => {
 
-    return axios.delete(`${baseUrl}/${endpoint}/${id}`, { headers: { 'Authorization': token } })
+    return axios.delete(`${baseUrl}/${endpoint}`, { headers: { 'Authorization': token } })
         .then(response => {
 
             return response.data;
