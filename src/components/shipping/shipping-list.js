@@ -42,7 +42,7 @@ export default class shippingList extends Component {
     replaceModalShipping(index, shipping) {
         this.setState({
             requiredItem: index,
-            currentProvider: shipping,
+            currentShipping: shipping,
         });
     }
 
@@ -59,7 +59,7 @@ export default class shippingList extends Component {
         this.setState((prevState) => ({
             currentShipping: {
                 ...prevState.currentShipping,
-                surname: e.price,
+                price: e.price,
             },
         }));
     }
@@ -68,7 +68,7 @@ export default class shippingList extends Component {
         this.setState((prevState) => ({
             currentShipping: {
                 ...prevState.currentShipping,
-                telephone: e.description,
+                description: e.description,
             },
         }));
     }
@@ -263,7 +263,7 @@ export default class shippingList extends Component {
             <div>
                 {this.state.isLoading && <span>Cargando Tipos de Envio</span>}
 
-                {this.state.providers && (
+                {this.state.shipping && (
                     <div>
                         <h3 className="text-center">Tipos de Envios</h3>
 
@@ -327,10 +327,10 @@ export default class shippingList extends Component {
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="surname">Precio</label>
+                                                <label htmlFor="price">Precio</label>
                                                 <input
                                                     name="Precio"
-                                                    type="text"
+                                                    type="number"
                                                     className="form-control"
                                                     id="precio"
                                                     value={
@@ -343,10 +343,10 @@ export default class shippingList extends Component {
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="telephone">Descripcion</label>
+                                                <label htmlFor="description">Descripcion</label>
                                                 <input
                                                     name="Descripcion"
-                                                    type="number"
+                                                    type="text"
                                                     className="form-control"
                                                     id="descripcion"
                                                     value={
@@ -434,14 +434,14 @@ export default class shippingList extends Component {
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="surname">Precio</label>
+                                                <label htmlFor="price">Precio</label>
                                                 <input
                                                     name="Precio"
-                                                    type="text"
+                                                    type="number"
                                                     className="form-control"
                                                     id="precio"
                                                     value={
-                                                        currentShipping ? currentShipping.surname || "" : ""
+                                                        currentShipping ? currentShipping.price || "" : ""
                                                     }
                                                     onChange={(e) =>
                                                         this.onChangePrice({ price: e.target.value })
@@ -450,10 +450,10 @@ export default class shippingList extends Component {
                                             </div>
 
                                             <div className="form-group">
-                                                <label htmlFor="telephone">Descripcion</label>
+                                                <label htmlFor="description">Descripcion</label>
                                                 <input
                                                     name="Descrpcion"
-                                                    type="number"
+                                                    type="text"
                                                     className="form-control"
                                                     id="Descripcion"
                                                     value={
