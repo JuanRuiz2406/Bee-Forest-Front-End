@@ -36,6 +36,7 @@ class Navbar extends React.Component{
                           <div className="dropdown-menu" _mstvisible="0">
                             <Link to="/home/clientes" className="dropdown-item">Clientes</Link>
                             <Link to="/home/colaboradores" className="dropdown-item">Colaboradores</Link>
+                            <Link to="/home/direcciones" className="dropdown-item">Direcciones</Link>
                           </div>
                         </li>
                         <li className="nav-item dropdown">

@@ -16,6 +16,7 @@ import Login from './components/Login';
 import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
 import shippingList from './components/shipping/shipping-list'
+import directionList from './components/direction/direction-list'
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/home/materiales" component={materialList}/>
             <Route path="/home/clientes" component={clientList}/>
             <Route path="/home/envios" component={shippingList}/>
+            <Route path="/home/direcciones" component={directionList}/>
           </Route>
           <Route path="/algo">
             <Link to="/home/productos" className="btn btn-primary">Hola</Link>
