@@ -218,6 +218,7 @@ export default class providerList extends Component {
         Swal.fire("Error", resp.message, "error");
       }
 
+      this.refreshPage();
     }
 
   }
