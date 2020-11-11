@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import productList from './components/product/product-list'
+import categoryList from './components/category/category-list'
 import providerList from './components/provider/provider-list'
 import materialList from './components/material/material-list'
 import clientList from './components/client/client-list'
@@ -28,6 +29,7 @@ function App() {
             <Navbar/>
             <Route path="/home/pedidos" component={RowTickets}/>
             <Route path="/home/productos"  component={productList}/>
+            <Route path="/home/tipo-de-productos"  component={categoryList}/>
             <Route path="/home/proveedores" component={providerList}/>
             <Route path="/home/materiales" component={materialList}/>
             <Route path="/home/clientes" component={clientList}/>
