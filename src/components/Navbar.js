@@ -15,7 +15,7 @@ class Navbar extends React.Component{
             <div className="container">
               
               <nav className="navbar navbar-expand-lg navbar-light bg-light navPrincipal rounded-lg">
-                  <Link to="/home/pedidos" className="navbar-brand font-weight-bold" type="button">Bee-Forest</Link>
+                  <Link to="/pedidos" className="navbar-brand font-weight-bold" type="button">Bee-Forest</Link>
                   <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation" _msthidden="A" _msthiddenattr="1375998" _mstaria-label="320099">
                     <span className="navbar-toggler-icon"></span>
                   </button>
