@@ -25,26 +25,26 @@ class Navbar extends React.Component{
                       <li className="nav-item dropdown">
                           <a className="nav-link dropdown-toggle font-weight-bold" data-toggle="dropdown" href="!#" role="button" aria-haspopup="true" aria-expanded="false">Productos</a>
                           <div className="dropdown-menu" _mstvisible="0">
-                            <Link to="/home/productos" className="dropdown-item">Productos</Link>
-                            <Link to="/home/tipo-de-productos" className="dropdown-item">Tipos de Producto</Link>
-                            <Link to="/home/materiales" className="dropdown-item">Materiales</Link>
-                            <Link to="/home/proveedores" className="dropdown-item">Proveedores</Link>
+                            <Link to="/productos" className="dropdown-item">Productos</Link>
+                            <Link to="/tipo-de-productos" className="dropdown-item">Tipos de Producto</Link>
+                            <Link to="/materiales" className="dropdown-item">Materiales</Link>
+                            <Link to="/proveedores" className="dropdown-item">Proveedores</Link>
                           </div>
                         </li>
                         <li className="nav-item dropdown">
                           <a className="nav-link dropdown-toggle font-weight-bold" data-toggle="dropdown" href="!#" role="button" aria-haspopup="true" aria-expanded="false">Personas</a>
                           <div className="dropdown-menu" _mstvisible="0">
-                            <Link to="/home/clientes" className="dropdown-item">Clientes</Link>
-                            <Link to="/home/colaboradores" className="dropdown-item">Colaboradores</Link>
-                            <Link to="/home/direcciones" className="dropdown-item">Direcciones</Link>
+                            <Link to="/clientes" className="dropdown-item">Clientes</Link>
+                            <Link to="/colaboradores" className="dropdown-item">Colaboradores</Link>
+                            <Link to="/direcciones" className="dropdown-item">Direcciones</Link>
                           </div>
                         </li>
                         <li className="nav-item dropdown">
                           <a className="nav-link dropdown-toggle font-weight-bold" data-toggle="dropdown" href="!#" role="button" aria-haspopup="true" aria-expanded="false">Pedidos</a>
                           <div className="dropdown-menu" _mstvisible="0">
-                            <Link to="/home/pedidos" className="dropdown-item">Pedidos</Link>
-                            <Link to="/home/devoluciones" className="dropdown-item">Devoluciones</Link>
-                            <Link to="/home/envios" className="dropdown-item">Tipos de Envio</Link>
+                            <Link to="/pedidos" className="dropdown-item">Pedidos</Link>
+                            <Link to="/devoluciones" className="dropdown-item">Devoluciones</Link>
+                            <Link to="/envios" className="dropdown-item">Tipos de Envio</Link>
                           </div>
                         </li>
                         </ul>

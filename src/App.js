@@ -1,10 +1,8 @@
 import React from 'react';
-import './App.css';
 import {
-  BrowserRouter as Router,
   Switch,
   Route,
-  Link,
+
 } from "react-router-dom";
 
 import productList from './components/product/product-list'
@@ -12,42 +10,29 @@ import categoryList from './components/category/category-list'
 import providerList from './components/provider/provider-list'
 import materialList from './components/material/material-list'
 import clientList from './components/client/client-list'
-import Login from './components/Login';
 import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
 import shippingList from './components/shipping/shipping-list'
-import directionList from './components/direction/direction-list'
-import collaboratorList from './components/collaborator/collaborator-list';
 
-function App() {
+export const App = () => {
+
   return (
-    <Router>
+    <>
+      <Navbar />
+
       <div className="container">
         <Switch>
-          <Route path="/login" exact>
-            <Login/>
-          </Route>
-          <Route path="/home">
-            <Navbar/>
-            <Route path="/home/pedidos" component={RowTickets}/>
-            <Route path="/home/productos"  component={productList}/>
-            <Route path="/home/tipo-de-productos"  component={categoryList}/>
-            <Route path="/home/proveedores" component={providerList}/>
-            <Route path="/home/materiales" component={materialList}/>
-            <Route path="/home/clientes" component={clientList}/>
-            <Route path="/home/envios" component={shippingList}/>
-            <Route path="/home/direcciones" component={directionList}/>
-            <Route path="/home/colaboradores" component={collaboratorList}/>
-          </Route>
-          <Route path="/algo">
-            <Link to="/home/productos" className="btn btn-primary">Hola</Link>
-          </Route>
+            <Route exact path="/pedidos" component={RowTickets}/>
+            <Route exact path="/productos"  component={productList}/>
+            <Route exact path="/tipo-de-productos"  component={categoryList}/>
+            <Route exact path="/proveedores" component={providerList}/>
+            <Route exact path="/materiales" component={materialList}/>
+            <Route exact path="/clientes" component={clientList}/>
+            <Route exact path="/envios" component={shippingList}/>
 
-         
+    
         </Switch>
       </div>
-    </Router>
-  );
+    </>
+  )
 }
-
-export default App;
