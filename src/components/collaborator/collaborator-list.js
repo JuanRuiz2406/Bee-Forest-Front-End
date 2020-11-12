@@ -538,6 +538,7 @@ export default class collaboratorList extends Component {
                             }
                             className="form-control"
                           >
+                            <option value="admin">Seleccion</option>
                             <option value="admin">Super Admin</option>
                             <option value="standard">Admin</option>
                           </select>
