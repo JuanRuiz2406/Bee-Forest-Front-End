@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import {
   getMaterials,
   storeMaterial,
-  uploadImage,
+  uploadMaterial,
   updateMaterial,
   deleteMaterial,
 } from "../../services/materialService";
@@ -177,7 +177,7 @@ export default class materialList extends Component {
     console.log(this.state.currentMaterial);
 
     let json = {
-      categoryId: this.state.currentMaterial.providerId,
+      providerId: this.state.currentMaterial.providerId,
       name: this.state.currentMaterial.name,
       price: this.state.currentMaterial.price,
       amount: this.state.currentMaterial.amount,
@@ -250,7 +250,7 @@ export default class materialList extends Component {
 
   async uploadImage(e) {
     e.preventDefault();
-    const resp = await uploadImage(
+    const resp = await uploadMaterial(
       `material/upload/${this.state.material[this.state.requiredItem].id}`,
       this.state.selectedFiles[0]
     );
@@ -296,7 +296,7 @@ export default class materialList extends Component {
           return (
             <img
               className="img"
-              src={`http://127.0.0.1:8000/api/material/image/${column.image ? column.image || null : "1604875316no-imagen.jpg"
+              src={`http://127.0.0.1:8000/api/material/image/${column.image ? column.image || null : "../img/noImagen.png"
                 }`}
               width="200"
               height="250"

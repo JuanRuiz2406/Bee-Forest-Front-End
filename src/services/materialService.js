@@ -80,7 +80,7 @@ export const deleteMaterial = (endpoint) => {
         })
 }
 
-export const uploadImage = (endpoint, file0) => { // por el momento solo un parametro luego tendremos que mandar el token
+export const uploadMaterial = (endpoint, file0) => { // por el momento solo un parametro luego tendremos que mandar el token
 
     let formData = new FormData();
 
