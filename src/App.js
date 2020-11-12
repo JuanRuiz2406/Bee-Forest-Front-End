@@ -14,6 +14,7 @@ import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
 import shippingList from './components/shipping/shipping-list'
 import directionList from './components/direction/direction-list'
+import collaboratorList from './components/collaborator/collaborator-list'
 
 export const App = () => {
 
@@ -31,7 +32,7 @@ export const App = () => {
             <Route exact path="/clientes" component={clientList}/>
             <Route exact path="/envios" component={shippingList}/>
             <Route exact path="/direcciones" component={directionList}/>
-    
+            <Route exact path="/colaboradores" component={collaboratorList}/>
         </Switch>
       </div>
     </>
