@@ -20,3 +20,52 @@ export const getDirections = ( endpoint ) => { // por el momento solo un paramet
         return error;
     });            
 }
+export const storeDirections = (endpoint, direction) => { // por el momento solo un parametro luego tendremos que mandar el token
+
+    let json = JSON.stringify(direction);
+    let params = "json=" + json;
+
+    return axios.post(`${baseUrl}/${endpoint}`, params, { headers: { 'Authorization': token } })
+        .then(response => {
+            console.log(response);
+            return response.data;
+
+        })
+
+        .catch(error => {
+            console.log(error);
+            return error;
+        });
+}
+export const updateDirections = (endpoint, direction) => { // por el momento solo un parametro luego tendremos que mandar el token
+
+    let json = JSON.stringify(direction);
+    let params = "json=" + json;
+
+    return axios.put(`${baseUrl}/${endpoint}`, params, { headers: { 'Authorization': token } })
+        .then(response => {
+            console.log(response);
+            return response.data;
+
+        })
+
+        .catch(error => {
+            console.log(error);
+            return error;
+        });
+}
+
+export const deleteDirections = (endpoint) => { // por el momento solo un parametro luego tendremos que mandar el token
+
+    return axios.delete(`${baseUrl}/${endpoint}`, { headers: { 'Authorization': token } })
+        .then(response => {
+            console.log(response);
+            return response.data;
+
+        })
+
+        .catch(error => {
+            console.log(error);
+            return error;
+        });
+}
