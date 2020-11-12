@@ -220,7 +220,7 @@ export default class directiontList extends Component {
               sort: true,
             },
             {
-              dataField: "ClientName",
+              dataField: "clientId",
               text: "Cliente",
               headerStyle: (colum, colIndex) => {
                 return { width: "150px", textAlign: "center" };

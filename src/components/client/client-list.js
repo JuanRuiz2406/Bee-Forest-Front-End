@@ -201,6 +201,14 @@ export default class clientList extends Component {
     
     const columns = [
       {
+        dataField: "id",
+        text: "ID",
+        headerStyle: (colum, colIndex) => {
+          return { width: "150px", textAlign: "center" };
+        },
+        sort: true,
+      },
+      {
         dataField: "identificationCard",
         text: "Cédula",
         headerStyle: (colum, colIndex) => {
