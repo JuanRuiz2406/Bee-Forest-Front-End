@@ -565,6 +565,7 @@ export default class collaboratorList extends Component {
                       id="edit"
                       type="submit"
                       className="btn btn-primary"
+                      disabled={currentCollaborator ? !this.state.currentCollaborator.password || "" : ""}
                       value="Editar"
                       data-dismiss="modal"
                       onClick={this.update}
