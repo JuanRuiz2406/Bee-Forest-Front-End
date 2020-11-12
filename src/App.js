@@ -17,6 +17,7 @@ import Navbar from './components/Navbar';
 import RowTickets from './components/RowTicket';
 import shippingList from './components/shipping/shipping-list'
 import directionList from './components/direction/direction-list'
+import collaboratorList from './components/collaborator/collaborator-list';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/home/clientes" component={clientList}/>
             <Route path="/home/envios" component={shippingList}/>
             <Route path="/home/direcciones" component={directionList}/>
+            <Route path="/home/colaboradores" component={collaboratorList}/>
           </Route>
           <Route path="/algo">
             <Link to="/home/productos" className="btn btn-primary">Hola</Link>
