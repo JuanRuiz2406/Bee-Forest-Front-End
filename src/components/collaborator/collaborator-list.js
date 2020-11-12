@@ -37,7 +37,7 @@ export default class collaboratorList extends Component {
 
       currentCollaborator: {
        id: '',
-        username: "",
+        username: "standard",
         password: "",
         email: "",
         role: "",
@@ -403,6 +403,7 @@ export default class collaboratorList extends Component {
                             }
                             className="form-control"
                           >
+                              <option value="standard">Seleccionar</option>
                             <option value="admin">Super Admin</option>
                             <option value="standard">Admin</option>
                           </select>
