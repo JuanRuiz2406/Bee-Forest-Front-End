@@ -521,8 +521,7 @@ export default class productList extends Component {
     ];
     const defaultSorted = [
       {
-        dataField: "name",
-        order: "desc",
+        dataField: "id",
       },
     ];
 

@@ -100,15 +100,9 @@ class Navbar extends React.Component {
                     aria-haspopup="true"
                     aria-expanded="false"
                   >
-                    Pedidos
+                    Envios
                   </a>
                   <div className="dropdown-menu" _mstvisible="0">
-                    <Link to="/pedidos" className="dropdown-item">
-                      Pedidos
-                    </Link>
-                    <Link to="/devoluciones" className="dropdown-item">
-                      Devoluciones
-                    </Link>
                     <Link to="/envios" className="dropdown-item">
                       Tipos de Envio
                     </Link>
